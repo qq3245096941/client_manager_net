@@ -12,7 +12,6 @@ export default {
                     method,
                     success(res) {
                         resolve(res);
-
                     },
                     error(err) {
                         console.log(err);
