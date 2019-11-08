@@ -6,7 +6,7 @@
                 <BreadcrumbItem>技能分析</BreadcrumbItem>
             </Breadcrumb>
         </p>
-        <Rwo>
+        <Row>
             <Col span="8">
                 <Form :label-width="80">
                     <!--分数区间-->
@@ -23,7 +23,7 @@
                     </FormItem>
                 </Form>
             </Col>
-        </Rwo>
+        </Row>
 
         <div>
             <div id="main" style="width: 80%;height: 600px"></div>
@@ -61,10 +61,8 @@
                         type:'funnel',
                         left: '10%',
                         top: 60,
-                        //x2: 80,
                         bottom: 60,
                         width: '80%',
-                        // height: {totalHeight} - y - y2,
                         min: 0,
                         max: 100,
                         minSize: '0%',

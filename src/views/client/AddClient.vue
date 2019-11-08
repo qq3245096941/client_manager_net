@@ -19,11 +19,15 @@
                             </Col>
                         </Row>
                     </FormItem>
+                    <FormItem label="微信号" prop="wxNum">
+                        <Row>
+                            <Col span="12">
+                                <Input placeholder="微信号" v-model="clientForm.wxNum"></Input>
+                            </Col>
+                        </Row>
+                    </FormItem>
                     <FormItem label="地址" prop="address">
                         <Input placeholder="地址尽量详细些" v-model="clientForm.address"></Input>
-                    </FormItem>
-                    <FormItem label="客户描述">
-                        <Input type="textarea" :autosize="{minRows: 4,maxRows: 5}" v-model="clientForm.desc"></Input>
                     </FormItem>
                     <FormItem label="收入">
                         <Input v-model="clientForm.income"></Input>
@@ -32,7 +36,7 @@
                         <Row>
                             <Col span="12">
                                 <Select v-model="clientForm.class">
-                                    <Option></Option>
+                                    <Option v-for="lv in lvList" :value="lv.lvCode">{{lv.lvName}}</Option>
                                 </Select>
                             </Col>
                         </Row>
@@ -40,10 +44,10 @@
                     <FormItem label="合作状态" prop="cooperationState">
                         <Row>
                             <Col span="12">
-                                <Select v-model="clientForm.state">
-                                    <Option>开发中</Option>
-                                    <Option>合作成功</Option>
-                                    <Option>合作失败</Option>
+                                <Select v-model="clientForm.cooperationStatus">
+                                    <Option value="2">开发中</Option>
+                                    <Option value="1">合作成功</Option>
+                                    <Option value="3">合作失败</Option>
                                 </Select>
                             </Col>
                         </Row>
@@ -51,9 +55,16 @@
                     <FormItem label="选择员工" prop="employee">
                         <Row>
                             <Col span="12">
-                                <Select v-model="clientForm.employee"></Select>
+                                <Select v-model="clientForm.employee">
+                                    <Option v-show="employee.userType!==1" v-for="employee in employeeList" :value="employee.userCode">
+                                        {{employee.realName}}
+                                    </Option>
+                                </Select>
                             </Col>
                         </Row>
+                    </FormItem>
+                    <FormItem label="资产评估">
+                        <Input type="textarea" :autosize="{minRows: 4,maxRows: 5}" v-model="clientForm.property"></Input>
                     </FormItem>
                     <!-- 提交 -->
                     <FormItem>
@@ -82,12 +93,13 @@
                 clientForm: {
                     name: '',
                     phone: '',
+                    wxNum: '',
                     address: '',
-                    desc: '',
                     income: '',
                     class: '',
-                    state: '',
-                    employee: ''
+                    cooperationStatus: '',
+                    employee: '',
+                    property:''
                 },
                 clientRules: {
                     name: [
@@ -103,6 +115,20 @@
                             validator: validatePhone,
                         }
                     ],
+                    wxNum: [
+                        {
+                            required: true,
+                            message: '请输入微信号',
+                            trigger: 'blur'
+                        }
+                    ],
+                    address: [
+                        {
+                            required: true,
+                            message: '地址必须填写',
+                            trigger: 'blur'
+                        }
+                    ],
                     class: [
                         {
                             required: true,
@@ -113,7 +139,7 @@
                     cooperationState: [
                         {
                             required: true,
-                            message: '合作状态不能为空',
+                            message: '合作状态必须选择',
                             trigger: 'blur'
                         }
                     ],
@@ -124,19 +150,39 @@
                             trigger: 'blur'
                         }
                     ]
-                }
+                },
+                /*部门列表*/
+                deptList: [],
+                /*等级列表*/
+                lvList: [],
+                /*员工列表*/
+                employeeList:[]
             }
         },
         methods: {
             submit(name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.$Message.success('Success!');
+
                     } else {
                         this.$Message.error('表单错误，请检查表单');
                     }
                 })
             }
+        },
+        mounted() {
+            this.request('/department/query').then(data => {
+                this.deptList = data.data;
+            });
+
+            this.request('/lv/query').then(data => {
+                this.lvList = data.data;
+            });
+
+            this.request('/sysUser/query').then(data=>{
+                this.employeeList = data.data;
+            })
+
         }
     }
 </script>

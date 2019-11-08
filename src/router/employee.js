@@ -1,6 +1,7 @@
 import AllEmployee from "../views/employee/AllEmployee";
 import AddEmployee from "../views/employee/AddEmployee";
 import RoleManager from "../views/employee/RoleManager";
+import DepartmentManager from "../views/employee/DepartmentManager";
 
 export default [
     {
@@ -12,7 +13,11 @@ export default [
         component: AddEmployee
     },
     {
-        path:'/RoleManager',
-        component:RoleManager
+        path: '/RoleManager',
+        component: RoleManager
+    },
+    {
+        path: '/DepartmentManager',
+        component: DepartmentManager
     }
 ]

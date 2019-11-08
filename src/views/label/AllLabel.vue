@@ -8,22 +8,12 @@
         </p>
 
         <Row>
-            <Col span="3" style="padding: 5px;">
-                <Card class="card" style="background: #ed4014">
-                    <Icon class="delete" type="md-trash" />
+            <Col v-for="label in labelList" span="3" style="padding: 5px;">
+                <Card class="card" :style="{background:label.intentionOfIndicatorsType===1?'#19be6b':'#ed4014'}">
+                    <Icon class="delete" type="md-trash" @click="deleteLabel(label.intentionOfIndicatorsCode)"/>
                     <div class="div">
-                        <h3>-10分</h3>
-                        暂无资金
-                    </div>
-                </Card>
-            </Col>
-
-            <Col span="3" style="padding: 5px;">
-                <Card class="card" style="background: #19be6b">
-                    <Icon class="delete" type="md-trash"/>
-                    <div class="div">
-                        <h3>10分</h3>
-                        资金充足
+                        <h3>{{label.intentionOfIndicatorsNum}}分</h3>
+                        {{label.intentionOfIndicatorsName}}
                     </div>
                 </Card>
             </Col>
@@ -34,23 +24,46 @@
 
 <script>
     export default {
-        name: "AllLabel"
+        name: "AllLabel",
+        data() {
+            return {
+                labelList: []
+            }
+        },
+        mounted() {
+            this.request('/intentionOfIndicators/query').then(data => {
+                this.labelList = data.data;
+                console.log(this.labelList);
+            })
+        },
+        methods: {
+            deleteLabel(code) {
+                this.request('/intentionOfIndicators/delete', {
+                    ids: code
+                }).then(data => {
+                    if(data.succeed===1){
+                        this.$Message.success('删除成功');
+                    }
+                    this.$Message.error(data.message);
+                })
+            }
+        }
     }
 </script>
 
 <style scoped>
-    .card{
+    .card {
         color: #fff
     }
 
-    .div{
+    .div {
         font-size: 15px;
         padding: 20px;
         position: relative;
         text-align: center;
     }
 
-    .delete{
+    .delete {
         position: absolute;
         top: 0;
         right: 0;

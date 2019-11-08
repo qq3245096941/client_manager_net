@@ -81,93 +81,30 @@
 <script>
     export default {
         name: "EmployeeStat",
-        methods: {
-            drawPie(el, title, data = []) {
-                echarts.init(document.getElementById(el),'macarons').setOption({
-                    title: {
-                        text: title,
-                        left: 'center',
-                        top: 20,
-                    },
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: "{a} <br/>{b} : {c} ({d}%)"
-                    },
-                    visualMap: {
-                        show: false,
-                        min: 80,
-                        max: 600,
-                        inRange: {
-                            colorLightness: [0, 1]
-                        }
-                    },
-                    series: [
-                        {
-                            name: '客户量',
-                            type: 'pie',
-                            radius: '55%',
-                            center: ['50%', '50%'],
-                            data: [
-                                ...data
-                                /*{value: 335, name: '组2'},
-                                {value: 310, name: '组1'},
-                                {value: 274, name: '组3'},
-                                {value: 235, name: '组4'},
-                                {value: 400, name: '组5'}*/
-                            ].sort(function (a, b) {
-                                return a.value - b.value;
-                            }),
-                            roseType: 'radius',
-                            labelLine: {
-                                normal: {
-                                    smooth: 0.2,
-                                    length: 10,
-                                    length2: 20
-                                }
-                            },
-                            itemStyle: {
-                                normal: {
-                                    // 设置扇形的阴影
-                                    shadowBlur: 30,
-                                    shadowColor: 'rgba(130,125,131,0.3)',
-                                    shadowOffsetX: -5,
-                                    shadowOffsetY: 5
-
-                                }
-                            },
-                            animationType: 'scale',
-                            animationEasing: 'elasticOut',
-                            animationDelay: function (idx) {
-                                return Math.random() * 200;
-                            }
-                        }
-                    ]
-                })
-            }
-        },
+        methods: {},
         mounted() {
-            this.drawPie('zong','客户总量',
+            this.$store.getters.drawPie('zong','客户总量',
                 [{value: 435, name: 'A类客户(435)'},
                 {value: 510, name: 'B类客户(510)'},
                 {value: 500, name: 'C类客户(500)'},
                 {value: 535, name: 'D类客户(535)'},
                 {value: 500, name: 'E类客户(500)'}]);
 
-            this.drawPie('main', 'A类客户',
+            this.$store.getters.drawPie('main', 'A类客户',
                 [{value: 335, name: '组2(335)'},
                     {value: 310, name: '组1(310)'},
                     {value: 274, name: '组3(274)'},
                     {value: 235, name: '组4(235)'},
                     {value: 400, name: '组5(400)'}]);
 
-            this.drawPie('main1', 'B类客户',
+            this.$store.getters.drawPie('main1', 'B类客户',
                 [{value: 225, name: '组2(225)'},
                     {value: 310, name: '组1(310)'},
                     {value: 324, name: '组3(324)'},
                     {value: 225, name: '组4(225)'},
                     {value: 300, name: '组5(300)'}]);
 
-            this.drawPie('main2', 'C类客户',
+            this.$store.getters.drawPie('main2', 'C类客户',
                 [{value: 225, name: '组2(225)'},
                     {value: 210, name: '组1(210)'},
                     {value: 324, name: '组3(324)'},

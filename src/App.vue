@@ -2,7 +2,7 @@
     <div class="layout">
         <Layout :style="{minHeight: '100vh'}">
             <Sider collapsible :collapsed-width="78">
-                <Menu theme="dark" width="auto">
+                <Menu theme="dark" width="auto" accordion>
                     <Submenu name="1">
                         <template slot="title">
                             <Icon type="md-menu" />
@@ -37,13 +37,23 @@
                         <MenuItem name="5-1" to="/AllEmployee">所有员工</MenuItem>
                         <MenuItem name="5-2" to="/AddEmployee">添加员工</MenuItem>
                         <MenuItem name="5-3" to="/RoleManager">角色管理</MenuItem>
-                        <MenuItem name="5-4" to="/AddClient">部门管理</MenuItem>
+                        <MenuItem name="5-4" to="/DepartmentManager">部门管理</MenuItem>
                     </Submenu>
                 </Menu>
             </Sider>
             <Layout>
-                <Header :style="{background: '#fff', boxShadow: '0 2px 3px 2px rgba(0,0,0,.1)'}"></Header>
-                <Content style="padding: 16px;">
+                <Header style="background: #fff;border-bottom: 1px solid #d2d2d2">
+                    <Row>
+                        <Col span="12">
+                            <Avatar src="https://i.loli.net/2017/08/21/599a521472424.jpg" size="30"/>苗文钊
+                        </Col>
+                        <Col span="12" style="text-align: right">
+                            <Icon type="md-notifications-outline" size="24"></Icon>
+                            <Badge :count="100" style="top: -10px;right: 10px"></Badge>
+                        </Col>
+                    </Row>
+                </Header>
+                <Content style="padding: 16px;height: 100px;overflow: auto">
                     <router-view></router-view>
                 </Content>
             </Layout>
@@ -51,10 +61,20 @@
     </div>
 </template>
 
+<script>
+    export default {
+        mounted() {
+
+        }
+    }
+</script>
+
 <style>
-    .layout-con {
+    .layout {
         height: 100%;
         width: 100%;
+        position: absolute;
+        overflow: hidden;
     }
 
     .menu-item span {
@@ -75,7 +95,7 @@
     }
 
     .collapsed-menu span {
-        width: 0px;
+        width: 0;
         transition: width .2s ease;
     }
 

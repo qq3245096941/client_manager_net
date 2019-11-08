@@ -7,49 +7,52 @@
             </Breadcrumb>
         </p>
 
-        <Table :columns="columns1" :data="data1"></Table>
+        <Table :loading="loading" :columns="classTable" :data="data"></Table>
     </Card>
 </template>
 
 <script>
     export default {
         name: "AllClass",
-        data(){
-            return{
-                columns1:[
+        data() {
+            return {
+                classTable: [
                     {
-                        title:'等级名称',
-                        key:'name',
-                        width:100
+                        title: '等级名称',
+                        key: 'lvName',
+                        width: 100
                     },
                     {
-                        title:'等级描述',
-                        key:'desc'
+                        title: '等级描述',
+                        key: 'lvRemarks'
+                    },
+                    {
+                        title: '操作',
+                        render:(h, param)=>{
+                            return h('Button', {
+                                props: {
+                                    type: 'success',
+                                },
+                                on: {
+                                    click: () => {
+                                        this.$router.push({path: '/AddClass', query: {code: param.row.lvCode}});
+                                    }
+                                }
+                            }, '修改');
+                        },
+                        width: 100
                     }
                 ],
-                data1:[
-                    {
-                        name:'A级',
-                        desc:'成交客户'
-                    },
-                    {
-                        name:'B级',
-                        desc:'见面客户'
-                    },
-                    {
-                        name:'C级',
-                        desc:'有项目意向客户且能邀约的'
-                    },
-                    {
-                        name:'D级',
-                        desc:'回访中能够有效沟通的客户'
-                    },
-                    {
-                        name:'E级',
-                        desc:'放弃客户'
-                    },
-                ]
+                data: [],
+                loading: false
             }
+        },
+        mounted() {
+            this.loading = true;
+            this.request('/lv/query').then(data => {
+                this.data = data.data;
+                this.loading = false;
+            })
         }
     }
 </script>
