@@ -9,13 +9,13 @@
         <Row>
             <Col span="8">
                 <Form :label-width="80" :rules="labelRules" :model="labelFrom" ref="labelFrom">
-                    <FormItem label="标签名称" prop="name">
-                        <Input type="text" v-model="labelFrom.name"></Input>
+                    <FormItem label="标签名称" prop="intentionOfIndicatorsName">
+                        <Input type="text" v-model="labelFrom.intentionOfIndicatorsName"></Input>
                     </FormItem>
-                    <FormItem label="分数" prop="grade">
+                    <FormItem label="分数" prop="intentionOfIndicatorsNum">
                         <Row>
                             <Col span="12">
-                                <Input type="number" v-model="labelFrom.grade"></Input>
+                                <Input type="number" v-model="labelFrom.intentionOfIndicatorsNum"></Input>
                             </Col>
                         </Row>
                     </FormItem>
@@ -35,18 +35,19 @@
         data() {
             return {
                 labelFrom: {
-                    name: '',
-                    grade: ''
+                    intentionOfIndicatorsName: '',
+                    intentionOfIndicatorsNum: '',
+                    state: 1
                 },
                 labelRules: {
-                    name: [
+                    intentionOfIndicatorsName: [
                         {
                             message: '标签名不能为空',
                             required: true,
                             trigger: 'blur'
                         }
                     ],
-                    grade: [
+                    intentionOfIndicatorsNum: [
                         {
                             message: '分数不能为空',
                             required: true,
@@ -59,9 +60,19 @@
         methods: {
             submit(name) {
                 this.$refs[name].validate((valid) => {
-                    console.log(valid);
                     if (valid) {
-                        this.$Message.success('Success!');
+                        /*判断分数是正数还是负数*/
+                        if (this.labelFrom.intentionOfIndicatorsNum >= 0) {
+                            Reflect.set(this.labelFrom, 'intentionOfIndicatorsType', 1);
+                        } else {
+                            Reflect.set(this.labelFrom, 'intentionOfIndicatorsType', 2);
+                        }
+
+                        Reflect.set(this.labelFrom, 'operatorCode', this.user.userCode);
+                        this.request('/intentionOfIndicators/insert', this.labelFrom, 'post').then(data => {
+                            this.$Message.success('添加成功');
+                            this.$router.push({path:'AllLabel'});
+                        })
                     } else {
                         this.$Message.error('表单错误，请检查表单');
                     }

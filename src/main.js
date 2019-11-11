@@ -9,9 +9,14 @@ Vue.config.productionTip = false;
 Vue.use(ViewUI);
 
 Vue.mixin({
-    methods:{
+    computed: {
+        user() {
+            return this.$store.state.user;
+        }
+    },
+    methods: {
         //ajax请求
-        request(url, data, method = 'get'){
+        request(url, data, method = 'get') {
             return new Promise((resolve) => {
                 $.ajax({
                     url: this.$store.state.rootUrl + url,

@@ -2,6 +2,7 @@
     <div>
         <Card>
             <clientParticulars :content.sync="modal.clientParticulars"></clientParticulars>
+            <addClientLabel :content.sync="modal.addClientLabel"></addClientLabel>
 
             <p slot="title">
                 <Breadcrumb>
@@ -27,58 +28,73 @@
 <script>
     import clientSearch from "../../components/clientSearch";
     import clientParticulars from "../../components/modal/client/clientParticulars";
+    import addClientLabel from "../../components/modal/client/addClientLabel";
 
     export default {
         components: {
-            clientSearch,clientParticulars
+            clientSearch, clientParticulars, addClientLabel
         },
         data() {
             return {
                 /*存储模态框状态数据，false表示不开启*/
-                modal:{
-                    clientParticulars:{
-                        isOpen:false,
-                        clientCode:''
+                modal: {
+                    clientParticulars: {
+                        isOpen: false,
+                        clientCode: ''
                     },
+                    addClientLabel: {
+                        isOpen: false,
+                        clientCode: ''
+                    }
                 },
                 clientTable: [
                     {
                         title: '姓名',
                         key: 'name',
-                        width:100
+                        width: 100
                     },
                     {
                         title: '电话',
-                        key: 'phone'
+                        key: 'phone',
+                        width: 130
                     },
                     {
                         title: '攻略进度',
                         key: 'schedule',
                         width: 200,
                         render: (h, params) => {
-                            return h('Progress', {
-                                props: {
-                                    status: 'active',
-                                    percent: params.row.schedule,
-                                },
-                                on:{
-                                    mouseenter(){
-                                        console.log('hello');
+                            return h('div', {}, [
+                                h('Progress', {
+                                    props: {
+                                        status: 'active',
+                                        percent: params.row.schedule,
                                     },
-
-                                }
-                            })
+                                }),
+                                h('Button', {
+                                    props: {
+                                        shape: 'circle',
+                                        icon: 'md-add',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            Reflect.set(this.modal.addClientLabel, 'isOpen', true);
+                                            Reflect.set(this.modal.addClientLabel, 'clientCode', params.row.clientCode)
+                                        }
+                                    }
+                                })
+                            ])
                         }
                     },
                     {
                         title: '添加时间',
                         key: 'createTime',
-                        width:150
+                        width: 150
                     },
                     {
                         title: '最后回访时间',
                         key: 'lastReturnTime',
-                        width:200
+                        width: 200
                     },
                     {
                         title: "开发人",
@@ -101,10 +117,10 @@
                                             props: {
                                                 type: 'success'
                                             },
-                                            on:{
-                                                click:()=>{
-                                                    Reflect.set(this.modal.clientParticulars,'isOpen',true);
-                                                    Reflect.set(this.modal.clientParticulars,'clientCode',params.row.clientCode)
+                                            on: {
+                                                click: () => {
+                                                    Reflect.set(this.modal.clientParticulars, 'isOpen', true);
+                                                    Reflect.set(this.modal.clientParticulars, 'clientCode', params.row.clientCode)
                                                 }
                                             }
                                         }, '查看详情'),
@@ -142,27 +158,28 @@
                     limit: 10
                 },
                 /*表格是否加载中*/
-                tableLoading:false
+                tableLoading: false
             }
         },
         watch: {
             /*监听页码变化*/
-            'pages.index': {
-                handler() {
-                    this.getClientList();
-                },
-            }
+            'pages.index':
+                {
+                    handler() {
+                        this.getClientList();
+                    }
+                }
         },
         methods: {
             /*搜索后返回的数据*/
-            searchClient(data){
-                Reflect.set(this.pages,'total',data.total);
+            searchClient(data) {
+                Reflect.set(this.pages, 'total', data.total);
                 this.clientList = data.data.map(item => {
                     return this.$store.getters.tidyClient(item);
                 });
             },
-            getLimit(limit){
-                Reflect.set(this.pages,'limit',limit);
+            getLimit(limit) {
+                Reflect.set(this.pages, 'limit', limit);
                 this.getClientList();
             },
             /*获取客户列表*/

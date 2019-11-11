@@ -32,11 +32,11 @@
                     <FormItem label="收入">
                         <Input v-model="clientForm.income"></Input>
                     </FormItem>
-                    <FormItem label="客户等级" prop="class">
+                    <FormItem label="客户等级" prop="lvCode">
                         <Row>
                             <Col span="12">
-                                <Select v-model="clientForm.class">
-                                    <Option v-for="lv in lvList" :value="lv.lvCode">{{lv.lvName}}</Option>
+                                <Select v-model="clientForm.lvCode">
+                                    <Option v-for="(lv,index) in lvList" :value="lv.lvCode" :key="index">{{lv.lvName}}</Option>
                                 </Select>
                             </Col>
                         </Row>
@@ -52,11 +52,12 @@
                             </Col>
                         </Row>
                     </FormItem>
-                    <FormItem label="选择员工" prop="employee">
+                    <FormItem label="选择员工" prop="sysUserCode">
                         <Row>
                             <Col span="12">
-                                <Select v-model="clientForm.employee">
-                                    <Option v-show="employee.userType!==1" v-for="employee in employeeList" :value="employee.userCode">
+                                <Select v-model="clientForm.sysUserCode">
+                                    <Option v-show="employee.userType!==1" v-for="(employee,index) in employeeList" :key="index"
+                                            :value="employee.userCode">
                                         {{employee.realName}}
                                     </Option>
                                 </Select>
@@ -64,7 +65,8 @@
                         </Row>
                     </FormItem>
                     <FormItem label="资产评估">
-                        <Input type="textarea" :autosize="{minRows: 4,maxRows: 5}" v-model="clientForm.property"></Input>
+                        <Input type="textarea" :autosize="{minRows: 4,maxRows: 5}"
+                               v-model="clientForm.property"></Input>
                     </FormItem>
                     <!-- 提交 -->
                     <FormItem>
@@ -96,10 +98,10 @@
                     wxNum: '',
                     address: '',
                     income: '',
-                    class: '',
+                    lvCode: '',
                     cooperationStatus: '',
-                    employee: '',
-                    property:''
+                    sysUserCode: '',
+                    property: ''
                 },
                 clientRules: {
                     name: [
@@ -129,21 +131,21 @@
                             trigger: 'blur'
                         }
                     ],
-                    class: [
+                    lvCode: [
                         {
                             required: true,
                             message: '客户等级必须选择',
                             trigger: 'blur'
                         }
                     ],
-                    cooperationState: [
+                    cooperationStatus: [
                         {
                             required: true,
                             message: '合作状态必须选择',
                             trigger: 'blur'
                         }
                     ],
-                    employee: [
+                    sysUserCode: [
                         {
                             required: true,
                             message: '请选择员工',
@@ -156,14 +158,17 @@
                 /*等级列表*/
                 lvList: [],
                 /*员工列表*/
-                employeeList:[]
+                employeeList: []
             }
         },
         methods: {
             submit(name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-
+                        this.request('/client/insert', this.clientForm).then(data => {
+                            this.$Message.success('添加成功');
+                            this.$router.push({path:'AllClient'});
+                        })
                     } else {
                         this.$Message.error('表单错误，请检查表单');
                     }
@@ -179,7 +184,7 @@
                 this.lvList = data.data;
             });
 
-            this.request('/sysUser/query').then(data=>{
+            this.request('/sysUser/query').then(data => {
                 this.employeeList = data.data;
             })
 

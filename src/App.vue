@@ -1,6 +1,7 @@
 <template>
     <div class="layout">
-        <Layout :style="{minHeight: '100vh'}">
+        <login v-if="user===''"></login>
+        <Layout :style="{minHeight: '100vh'}" v-else>
             <Sider collapsible :collapsed-width="78">
                 <Menu theme="dark" width="auto" accordion>
                     <Submenu name="1">
@@ -45,7 +46,8 @@
                 <Header style="background: #fff;border-bottom: 1px solid #d2d2d2">
                     <Row>
                         <Col span="12">
-                            <Avatar src="https://i.loli.net/2017/08/21/599a521472424.jpg" size="30"/>苗文钊
+                            <Avatar src="https://i.loli.net/2017/08/21/599a521472424.jpg" size="30"/>
+                                苗文钊<Button @click="quitLogin" type="text">退出登录</Button>
                         </Col>
                         <Col span="12" style="text-align: right">
                             <Icon type="md-notifications-outline" size="24"></Icon>
@@ -62,9 +64,17 @@
 </template>
 
 <script>
-    export default {
-        mounted() {
+    import login from './views/login'
 
+    export default {
+        name:'App',
+        components:{
+            login
+        },
+        methods:{
+            quitLogin(){
+                this.$store.commit('setUser','');
+            }
         }
     }
 </script>
