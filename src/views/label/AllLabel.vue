@@ -6,15 +6,17 @@
                 <BreadcrumbItem>所有标签</BreadcrumbItem>
             </Breadcrumb>
         </p>
-
         <Row>
             <Col v-for="(label,index) in labelList" span="3" style="padding: 5px;" :key="index">
                 <Card class="card" :style="{background:label.intentionOfIndicatorsType===1?'#19be6b':'#ed4014'}">
-                    <Icon class="delete" type="md-trash" @click="deleteLabel(label.intentionOfIndicatorsCode,index)"/>
-                    <div class="div">
-                        <h3>{{label.intentionOfIndicatorsNum}}分</h3>
-                        {{label.intentionOfIndicatorsName}}
-                    </div>
+                    <h1>{{label.intentionOfIndicatorsNum}}分</h1>
+                    <p>{{label.intentionOfIndicatorsName}}</p>
+                    <ButtonGroup size="small">
+                        <Button shape="circle" icon="ios-brush"
+                                @click="editLabel(label.intentionOfIndicatorsCode)"></Button>
+                        <Button shape="circle" icon="md-trash"
+                                @click="deleteLabel(label.intentionOfIndicatorsCode,index)"></Button>
+                    </ButtonGroup>
                 </Card>
             </Col>
         </Row>
@@ -48,6 +50,10 @@
                         this.$Message.error(data.message);
                     }
                 })
+            },
+            /*编辑标签*/
+            editLabel(code) {
+                this.$router.push({path: '/AddLabel', query: {code}})
             }
         }
     }
@@ -56,19 +62,5 @@
 <style scoped>
     .card {
         color: #fff
-    }
-
-    .div {
-        font-size: 15px;
-        padding: 20px;
-        position: relative;
-        text-align: center;
-    }
-
-    .delete {
-        position: absolute;
-        top: 0;
-        right: 0;
-        margin: 10px;
     }
 </style>

@@ -1,29 +1,29 @@
-# client_manager_net
-
-## Project setup
+### 监听data里面对象的属性变化
 ```
-npm install
+ watch: {
+    /*监听页码变化*/
+    'content.isOpen': {
+        async handler(isOpen) {
+            if (isOpen === true) {
+                let data = (await this.request('/customerIntention/query', {clientCode: this.content.clientCode})).data;
+                console.log(data);
+            }
+        }
+    }
+},
 ```
-
-### Compiles and hot-reloads for development
+***
+###删除客户需调用 /client/update
 ```
-npm run serve
+this.request('/client/update', {
+    clientCode: params.row.clientCode,
+    cooperationStatus:4
+}).then(data => {
+    if (data.succeed === 1) {
+        this.$Message.success('删除成功');
+        this.clientList.splice(params.index, 1);
+    } else {
+        this.$Message.error(data.message);
+    }
+})
 ```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

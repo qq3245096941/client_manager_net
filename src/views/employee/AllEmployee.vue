@@ -75,6 +75,8 @@
                     Reflect.set(parent, 'children', children);
                     treeData.push(parent);
                 }
+
+                console.log(treeData);
                 return [{
                     name: '总平台',
                     children: treeData

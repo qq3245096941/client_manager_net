@@ -28,19 +28,38 @@
                     },
                     {
                         title: '操作',
-                        render:(h, param)=>{
-                            return h('Button', {
-                                props: {
-                                    type: 'success',
-                                },
-                                on: {
-                                    click: () => {
-                                        this.$router.push({path: '/AddClass', query: {code: param.row.lvCode}});
+                        width: 200,
+                        render: (h, param) => {
+                            return h('ButtonGroup', {}, [
+                                h('Button', {
+                                    props: {
+                                        type: 'success',
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.$router.push({path: '/AddClass', query: {code: param.row.lvCode}});
+                                        }
                                     }
-                                }
-                            }, '修改');
-                        },
-                        width: 100
+                                }, '修改'),
+                                h('Button', {
+                                    props: {
+                                        type: 'error'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            if (!confirm('确定删除吗?')) return;
+
+                                            this.request('/lv/delete', {
+                                                ids: param.row.lvCode
+                                            }).then(data => {
+                                                this.$Message.success('删除成功');
+                                                this.data.splice(param.index, 1);
+                                            })
+                                        }
+                                    }
+                                }, '删除')
+                            ])
+                        }
                     }
                 ],
                 data: [],

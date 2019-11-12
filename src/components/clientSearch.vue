@@ -59,23 +59,65 @@
                             <FormItem label="地址">
                                 <Input placeholder="地址" v-model="searchFrom.address"></Input>
                             </FormItem>
-
-                            <!--选择员工
-                            <FormItem label="员工">
-                                <Row>
-                                    <Col span="11"><Select placeholder="选择部门" v-model="searchFrom.department"></Select></Col>
-                                    <Col span="2" style="text-align: center">-</Col>
-                                    <Col span="11"><Select placeholder="选择员工" v-model="searchFrom.employee"></Select></Col>
-                                </Row>
-                            </FormItem>-->
-
-                            <!--<FormItem label="等级">
-                                <Col span="11"><Select v-model="searchFrom.class"></Select></Col>
-                            </FormItem>-->
                         </Form>
                     </Col>
-                    <Col class="searchClass">
-                        <Button type="success" @click="search" :loading="isLoading">搜索</Button>
+                    <Col span="9">
+                        <Form :label-width="80" v-model="searchFrom">
+                            <!--选择部门-->
+                            <FormItem label="选择部门">
+                                <Row>
+                                    <Col span="11">
+                                        <Select placeholder="选择部门" v-model="searchFrom.departmentCode"
+                                                :disabled="user.userType===2||user.userType===3">
+                                            <Option value="">所有部门</Option>
+                                            <Option v-for="(dept,index) in deptAll" :key="index"
+                                                    :value="dept.departmentCode">{{dept.departmentName}}
+                                            </Option>
+                                        </Select>
+                                    </Col>
+                                    <Col span="2" style="text-align: center">-</Col>
+                                    <Col span="11">
+                                        <Select placeholder="选择员工" v-model="searchFrom.sysUserCode"
+                                                :disabled="user.userType===3">
+                                            <Option value="">所有员工</Option>
+                                            <Option v-for="(employee,index) in employeeList" :key="index"
+                                                    :value="employee.userCode">
+                                                {{employee.realName}}
+                                            </Option>
+                                        </Select>
+                                    </Col>
+                                </Row>
+                            </FormItem>
+                            <!--选择等级-->
+                            <FormItem label="等级">
+                                <Col span="11">
+                                    <Select v-model="searchFrom.lvCode">
+                                        <Option value="">全部等级</Option>
+                                        <Option v-for="(classObj,index) in classList" :kye="index"
+                                                :value="classObj.lvCode">
+                                            {{classObj.lvName}}
+                                        </Option>
+                                    </Select>
+                                </Col>
+                            </FormItem>
+
+                            <!--选择等级-->
+                            <FormItem label="客户状态">
+                                <Col span="11">
+                                    <Select v-model="searchFrom.cooperationStatus">
+                                        <Option value="">全部状态</Option>
+                                        <Option value="1">合作成功</Option>
+                                        <Option value="2">开发中</Option>
+                                        <Option value="3">合作失败</Option>
+                                    </Select>
+                                </Col>
+                            </FormItem>
+                        </Form>
+
+                        <div style="text-align: center">
+                            <Button style="display: inline" type="success" @click="search" :loading="isLoading">搜索
+                            </Button>
+                        </div>
                     </Col>
                 </Row>
             </p>
@@ -95,10 +137,20 @@
                     endDateTime: '',
                     scheduleStart: '',
                     scheduleEnd: '',
-                    address: ''
+                    address: '',
+                    departmentCode: '',
+                    sysUserCode: '',
+                    lvCode: '',
+                    cooperationStatus: ''
                 },
                 /*是否加载中*/
-                isLoading: false
+                isLoading: false,
+                /*所有部门*/
+                deptAll: [],
+                /*选择部门时，所在的员工*/
+                employeeList: [],
+                /*所有等级*/
+                classList: []
             }
         },
         methods: {
@@ -109,17 +161,36 @@
                     this.$Message.success(`搜索完成，总共搜索到${data.data.length}条数据`);
                     this.$emit('search', data);
                 });
+            }
+        },
+        watch: {
+            /*监听部门的选择，获取部门的员工*/
+            'searchFrom.departmentCode': {
+                async handler(val) {
+                    this.employeeList = (await this.request('/sysUser/query', {parentCode: val})).data;
+                }
+            }
+        },
+        async mounted() {
+            this.request('/lv/query').then(data => {
+                this.classList = data.data;
+            });
 
+            this.deptAll = (await this.request('/department/query')).data;
 
+            switch (this.user.userType) {
+                case 2:
+                    this.searchFrom.departmentCode = this.user.parentCode;
+                    break;
+                case 3:
+                    this.searchFrom.departmentCode = this.user.parentCode;
+                    this.searchFrom.sysUserCode = this.user.userCode;
+                    break;
             }
         }
     }
 </script>
 
 <style scoped>
-    .searchClass {
-        position: absolute;
-        right: 50%;
-        bottom: 50%;
-    }
+
 </style>

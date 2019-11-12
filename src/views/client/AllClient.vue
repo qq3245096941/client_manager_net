@@ -3,6 +3,9 @@
         <Card>
             <clientParticulars :content.sync="modal.clientParticulars"></clientParticulars>
             <addClientLabel :content.sync="modal.addClientLabel"></addClientLabel>
+            <allotEmployee :content.sync="modal.allotEmployee"></allotEmployee>
+            <!--添加跟进弹框-->
+            <addFollow :content.sync="modal.addFollow"></addFollow>
 
             <p slot="title">
                 <Breadcrumb>
@@ -11,14 +14,9 @@
                 </Breadcrumb>
             </p>
             <clientSearch @search="searchClient"></clientSearch>
-            <!--内容-->
-            <Tabs value="name1">
-                <TabPane label="开发中" name="name1">
-                    <Table :loading="tableLoading" :columns="clientTable" height="520" :data="clientList"></Table>
-                </TabPane>
-                <TabPane label="已完成" name="name2">已完成</TabPane>
-                <TabPane label="已失败" name="name3">已失败</TabPane>
-            </Tabs>
+
+            <Table :loading="tableLoading" :columns="clientTable" height="520" :data="clientList"></Table>
+
             <Divider dashed/>
             <Page :total="pages.total" show-sizer :current.sync="pages.index" :page-size="pages.limit"
                   @on-page-size-change="getLimit"/>
@@ -29,10 +27,12 @@
     import clientSearch from "../../components/clientSearch";
     import clientParticulars from "../../components/modal/client/clientParticulars";
     import addClientLabel from "../../components/modal/client/addClientLabel";
+    import allotEmployee from "../../components/modal/client/allotEmployee";
+    import addFollow from "../../components/modal/client/addFollow";
 
     export default {
         components: {
-            clientSearch, clientParticulars, addClientLabel
+            clientSearch, clientParticulars, addClientLabel, allotEmployee, addFollow
         },
         data() {
             return {
@@ -42,7 +42,18 @@
                         isOpen: false,
                         clientCode: ''
                     },
+                    /*添加标签弹框*/
                     addClientLabel: {
+                        isOpen: false,
+                        clientCode: ''
+                    },
+                    /*分配员工弹框*/
+                    allotEmployee: {
+                        isOpen: false,
+                        clientCode: ''
+                    },
+                    /*添加跟进弹框*/
+                    addFollow: {
                         isOpen: false,
                         clientCode: ''
                     }
@@ -103,7 +114,7 @@
                     {
                         title: '操作',
                         key: 'option',
-                        width: 300,
+                        width: 350,
                         render: (h, params) => {
                             return h('ButtonGroup', {
                                     props: {
@@ -124,24 +135,75 @@
                                                 }
                                             }
                                         }, '查看详情'),
+                                    /*添加跟进*/
+                                    h('Button',
+                                        {
+                                            props: {
+                                                type: 'warning'
+                                            },
+                                            on: {
+                                                click: () => {
+                                                    Reflect.set(this.modal.addFollow, 'isOpen', true);
+                                                    Reflect.set(this.modal.addFollow, 'clientCode', params.row.clientCode)
+                                                }
+                                            }
+                                        }, '添加跟进'),
                                     h('Button',
                                         {
                                             props: {
                                                 type: 'primary'
                                             },
+                                            style: {
+                                                display: this.user.userType !== 1 ? 'inline' : 'none'
+                                            },
                                             on: {
                                                 click: () => {
-
+                                                    this.$router.push({
+                                                        path: 'AddClient',
+                                                        query: {code: params.row.clientCode}
+                                                    })
                                                 }
                                             }
                                         }, '修改'),
                                     h('Button',
                                         {
                                             props: {
-                                                type: 'warning'
+                                                type: 'primary',
                                             },
-                                            click: () => {
+                                            style: {
+                                                display: this.user.userType === 1 ? 'inline' : 'none'
+                                            },
+                                            on: {
+                                                click: () => {
+                                                    Reflect.set(this.modal.allotEmployee, 'isOpen', true);
+                                                    Reflect.set(this.modal.allotEmployee, 'clientCode', params.row.clientCode)
+                                                }
+                                            }
+                                        }, '分配员工'),
+                                    h('Button',
+                                        {
+                                            props: {
+                                                type: 'error'
+                                            },
+                                            style: {
+                                                display: this.user.userType !== 1 ? 'inline' : 'none'
+                                            },
+                                            on: {
+                                                click: () => {
+                                                    if (!confirm('确定删除吗?')) return;
 
+                                                    this.request('/client/update', {
+                                                        clientCode: params.row.clientCode,
+                                                        cooperationStatus: 4
+                                                    }).then(data => {
+                                                        if (data.succeed === 1) {
+                                                            this.$Message.success('删除成功');
+                                                            this.clientList.splice(params.index, 1);
+                                                        } else {
+                                                            this.$Message.error(data.message);
+                                                        }
+                                                    })
+                                                }
                                             }
                                         }, '删除'),
                                 ]
@@ -185,10 +247,21 @@
             /*获取客户列表*/
             getClientList() {
                 this.tableLoading = true;
-                this.request('/client/query', {
+
+                let obj = {
                     page: this.pages.index,
-                    limit: this.pages.limit
-                }).then(data => {
+                    limit: this.pages.limit,
+                };
+
+                switch (this.user.userType) {
+                    case 2:
+                        Reflect.set(obj, 'departmentCode', this.user.parentCode);
+                        break;
+                    case 3:
+                        Reflect.set(obj, 'sysUserCode', this.user.userCode);
+                }
+
+                this.request('/client/query', obj).then(data => {
                     Reflect.set(this.pages, 'total', data.total);
                     this.tableLoading = false;
                     this.clientList = data.data.map(item => {

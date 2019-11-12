@@ -47,7 +47,7 @@
                     <Row>
                         <Col span="12">
                             <Avatar src="https://i.loli.net/2017/08/21/599a521472424.jpg" size="30"/>
-                                苗文钊<Button @click="quitLogin" type="text">退出登录</Button>
+                                {{user.realName}}<Button @click="quitLogin" type="text">退出登录</Button>
                         </Col>
                         <Col span="12" style="text-align: right">
                             <Icon type="md-notifications-outline" size="24"></Icon>
