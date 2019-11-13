@@ -1,23 +1,42 @@
 <template>
     <Card>
-        <Modal :value="modal.isOpen" :title="modal.userData.realName" @on-cancel="editUser(modal.userData.userCode)"
-               cancel-text="修改">
-            <Alert show-icon type="success">点击账号和密码，直接复制。</Alert>
-            <CellGroup @on-click="userForm">
-                <Cell :title="modal.userData.nickName" label="账号" name="username"/>
-                <Cell :title="modal.userData.passWord" label="密码" name="password"/>
-                <Cell title="姓名" :extra="modal.userData.realName"/>
-                <Cell title="加入时间" :extra="modal.userData.createTime"/>
-                <Cell title="角色" :extra="modal.userData.roleName"/>
-                <Cell title="人员类型" :extra="modal.userData.userType"/>
-            </CellGroup>
+        <Modal :value="isOpen" title="查看详情" @on-cancel="isOpen=false" @on-ok="isOpen=false">
+            <Alert show-icon type="success">点击复制账号和密码，直接复制在剪切板上。</Alert>
+            <Collapse v-model="currentColl" accordion>
+                <Panel v-for="(employee,index) in userData" :key="index" :name="index+''">
+                    {{employee.realName}}
+                    <div slot="content">
+                        <CellGroup>
+                            <Cell :title="employee.nickName" label="账号" name="username">
+                                <Button slot="extra">点击复制</Button>
+                            </Cell>
+                            <Cell :title="employee.passWord" label="密码" name="password">
+                                <Button slot="extra">点击复制</Button>
+                            </Cell>
+                            <Cell title="姓名">
+                                <Tag checkable slot="extra" color="primary">{{employee.realName}}</Tag>
+                            </Cell>
+                            <Cell title="加入时间" :extra="employee.createTime"/>
+                            <Cell title="角色" :extra="employee.roleName"/>
+                            <Cell title="人员类型" :extra="employee.userType"/>
+                            <Cell title="操作">
+                                <ButtonGroup slot="extra">
+                                    <Button type="text" @click="deleteEmployee(employee.userCode)">删除</Button>
+                                    <Button type="success" @click="editEmployee(employee.userCode)">修改</Button>
+                                </ButtonGroup>
+                            </Cell>
+                        </CellGroup>
+                    </div>
+                </Panel>
+            </Collapse>
         </Modal>
-        <p slot="title">
+
+        <div slot="title">
             <Breadcrumb>
                 <BreadcrumbItem>员工管理</BreadcrumbItem>
                 <BreadcrumbItem>所有员工</BreadcrumbItem>
             </Breadcrumb>
-        </p>
+        </div>
         <Alert show-icon type="warning">点击员工小圆点，查看员工详细信息。</Alert>
         <div id="tree" style="width: 1000px;height:400px;margin: 0 auto"></div>
     </Card>
@@ -28,85 +47,53 @@
         name: "AllEmployee",
         data() {
             return {
-                modal: {
-                    isOpen: false,
-                    userData: {}
-                }
+                isOpen: false,
+                userData: [],
+                currentColl: ''
             }
         },
-        methods: {
-            /*修改用户*/
-            editUser(code) {
-                this.$router.push({path: '/AddEmployee', query: {code}});
-            },
-            userForm(name) {
-                switch (name) {
-                    case 'username':
-                        document.execCommand(this.modal.userData.nickName, false, '#000');
-                        this.$Message.success('复制成功');
-                        break;
-                    case 'password':
-                        document.execCommand(this.modal.userData.password, false, '#000');
-                        this.$Message.success('复制成功');
-                        break;
-                }
-            },
-            async getTreeMapData() {
-                /*部门数据*/
-                let departmentList = (await this.request('/department/query')).data;
-                /*树图数据*/
-                let treeData = [];
-                for (const department of departmentList) {
-                    /*父节点对象*/
-                    let parent = {};
-                    /*页节点数组*/
-                    let children = [];
-                    Reflect.set(parent, 'name', department.departmentName);
-                    let userList = (await this.request('/sysUser/query', {
-                        parentCode: department.departmentCode
-                    })).data;
-                    userList.forEach(user => {
-                        children.push({
-                            children: [],
-                            code: user.userCode,
-                            name: user.realName + (user.userType === 2 ? '(组长)' : '')
-                        });
-                    });
-                    Reflect.set(parent, 'children', children);
-                    treeData.push(parent);
-                }
-
-                console.log(treeData);
-                return [{
-                    name: '总平台',
-                    children: treeData
-                }];
-            },
-            treeClick(param) {
-                console.log(param);
-                /*进入方法必须是叶节点，也就是必须是员工*/
-                if (param.data.children.length > 0) return;
-
-                this.modal.isOpen = true;
-                this.request('/sysUser/queryOne', {
-                    id: param.data.code
-                }).then(data => {
-                    this.modal.userData = this.$store.getters.tidyEmployee(data.data);
+        watch: {
+            /*监听v-for渲染完成*/
+            userData() {
+                this.$nextTick(() => {
+                    this.currentColl = '0';
                 })
             }
         },
+        methods: {
+            editEmployee(code) {
+                this.$router.push({path: '/AddEmployee', query: {code}})
+            },
+            deleteEmployee(code) {
+                if (!confirm('确定删除吗?')) return;
+            },
+            /*点击叶节点进入员工详情*/
+            treeClick(param) {
+                this.userData = [];
+                this.isOpen = true;
+
+                if (param.data.code === null) return;
+
+                const employeeCodeList = param.data.code.split(',');
+                for (let code of employeeCodeList) {
+                    this.request('/sysUser/queryOne', {
+                        id: code
+                    }).then(data => {
+                        this.userData.push(this.$store.getters.tidyEmployee(data.data));
+                    })
+                }
+            }
+        },
         mounted() {
-            this.getTreeMapData().then(data => {
+            this.request('/sysUser/tree').then(data => {
                 const tree = echarts.init(document.getElementById('tree'), 'macarons');
                 tree.on('click', this.treeClick);
-
                 tree.setOption({
                     series: [
                         {
                             type: 'tree',
-                            data,
+                            data: data.data,
                             orient: 'vertical',
-                            expandAndCollapse: true,
                             label: {
                                 normal: {
                                     position: 'bottom',
@@ -124,6 +111,8 @@
                                     }
                                 }
                             },
+                            /*默认展开的层数*/
+                            initialTreeDepth: 4,
                             animationDurationUpdate: 500
                         }
                     ]

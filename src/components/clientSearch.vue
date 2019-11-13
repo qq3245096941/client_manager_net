@@ -69,7 +69,7 @@
                                     <Col span="11">
                                         <Select placeholder="选择部门" v-model="searchFrom.departmentCode"
                                                 :disabled="user.userType===2||user.userType===3">
-                                            <Option value="">所有部门</Option>
+                                            <Option v-show="user.userType===1" value="">所有部门</Option>
                                             <Option v-for="(dept,index) in deptAll" :key="index"
                                                     :value="dept.departmentCode">{{dept.departmentName}}
                                             </Option>
@@ -167,11 +167,12 @@
             /*监听部门的选择，获取部门的员工*/
             'searchFrom.departmentCode': {
                 async handler(val) {
-                    this.employeeList = (await this.request('/sysUser/query', {parentCode: val})).data;
+                    this.employeeList = (await this.request('/sysUser/query', {parentCode: val, userType: 3})).data;
                 }
             }
         },
         async mounted() {
+
             this.request('/lv/query').then(data => {
                 this.classList = data.data;
             });
@@ -186,6 +187,13 @@
                     this.searchFrom.departmentCode = this.user.parentCode;
                     this.searchFrom.sysUserCode = this.user.userCode;
                     break;
+                case 4:
+                    this.deptAll = (await this.request('/department/query', {
+                        sysUserCode: this.user.userCode,
+                        type: 4
+                    })).data;
+                    break;
+
             }
         }
     }

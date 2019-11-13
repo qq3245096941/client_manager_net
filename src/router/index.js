@@ -5,6 +5,7 @@ import client from "./client";
 import label from "./label";
 import employee from "./employee";
 import statistics from "./statistics";
+import task from "./task";
 
 Vue.use(VueRouter);
 
@@ -12,7 +13,8 @@ const routes = [
     ...client,
     ...label,
     ...employee,
-    ...statistics
+    ...statistics,
+    ...task
 ];
 
 const router = new VueRouter({

@@ -6,8 +6,8 @@
                 <BreadcrumbItem>所有标签</BreadcrumbItem>
             </Breadcrumb>
         </p>
-        <Row>
-            <Col v-for="(label,index) in labelList" span="3" style="padding: 5px;" :key="index">
+        <Row :gutter="8">
+            <Col v-for="(label,index) in labelList" span="3" :key="index" >
                 <Card class="card" :style="{background:label.intentionOfIndicatorsType===1?'#19be6b':'#ed4014'}">
                     <h1>{{label.intentionOfIndicatorsNum}}分</h1>
                     <p>{{label.intentionOfIndicatorsName}}</p>

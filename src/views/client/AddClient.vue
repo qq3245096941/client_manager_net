@@ -215,7 +215,8 @@
 
             /*当前部门的员工*/
             this.request('/sysUser/query', {
-                parentCode: this.user.parentCode
+                parentCode: this.user.parentCode,
+                userType:3
             }).then(data => {
                 this.employeeList = data.data;
             })

@@ -43,7 +43,6 @@
                     }));
             });
 
-
             this.request('/lv/query').then(dept => {
                 this.deptDrawList = Array.from({length: dept.data.length}).map((item, index) => {
                     return index;
@@ -62,7 +61,6 @@
                     })
                 })
             })
-
         }
     }
 </script>

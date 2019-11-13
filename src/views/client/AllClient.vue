@@ -253,12 +253,18 @@
                     limit: this.pages.limit,
                 };
 
+
                 switch (this.user.userType) {
                     case 2:
                         Reflect.set(obj, 'departmentCode', this.user.parentCode);
                         break;
                     case 3:
                         Reflect.set(obj, 'sysUserCode', this.user.userCode);
+                        break;
+                    case 4:
+                        Reflect.set(obj,'userType',4);
+                        Reflect.set(obj,'bossId',this.user.userCode);
+                        break;
                 }
 
                 this.request('/client/query', obj).then(data => {

@@ -4,41 +4,13 @@
         <Layout :style="{minHeight: '100vh'}" v-else>
             <Sider collapsible :collapsed-width="78">
                 <Menu theme="dark" width="auto" accordion>
-                    <Submenu name="1">
+                    <Submenu v-show="parentMenu.isShow===1" v-for="(parentMenu,index) in menuList" :name="index" :key="index">
                         <template slot="title">
-                            <Icon type="md-menu" />
-                            统计分析
+                            <Icon :type="parentMenu.ext2"/>
+                            {{parentMenu.menuName}}
                         </template>
-                        <MenuItem name="1-1" to="/SkillStat">技能分析</MenuItem>
-                        <MenuItem name="1-2" to="/EmployeeStat">客户统计</MenuItem>
-                    </Submenu>
-                    <Submenu name="2">
-                        <template slot="title">
-                            <Icon type="md-contact" />
-                            客户管理
-                        </template>
-                        <MenuItem name="2-1" to="/AllClient">所有客户</MenuItem>
-                        <MenuItem name="2-2" to="/AddClient">添加客户</MenuItem>
-                        <MenuItem name="2-3" to="/AllClass">所有等级</MenuItem>
-                        <MenuItem name="2-4" to="/AddClass">添加等级</MenuItem>
-                    </Submenu>
-                    <Submenu name="4">
-                        <template slot="title">
-                            <Icon type="md-bookmark" />
-                            标签管理
-                        </template>
-                        <MenuItem name="4-1" to="/AllLabel">所有标签</MenuItem>
-                        <MenuItem name="4-2" to="/AddLabel">添加标签</MenuItem>
-                    </Submenu>
-                    <Submenu name="5">
-                        <template slot="title">
-                            <Icon type="ios-people" />
-                            员工管理
-                        </template>
-                        <MenuItem name="5-1" to="/AllEmployee">所有员工</MenuItem>
-                        <MenuItem name="5-2" to="/AddEmployee">添加员工</MenuItem>
-                        <MenuItem name="5-3" to="/RoleManager">角色管理</MenuItem>
-                        <MenuItem name="5-4" to="/DepartmentManager">部门管理</MenuItem>
+                        <MenuItem v-show="childrenMenu.isShow===1" v-for="(childrenMenu,childIndex) in parentMenu.sonList" :name="index+'-'+childIndex"
+                                  :to="childrenMenu.redirectUrl">{{childrenMenu.menuName}}</MenuItem>
                     </Submenu>
                 </Menu>
             </Sider>
@@ -47,7 +19,8 @@
                     <Row>
                         <Col span="12">
                             <Avatar src="https://i.loli.net/2017/08/21/599a521472424.jpg" size="30"/>
-                                {{user.realName}}<Button @click="quitLogin" type="text">退出登录</Button>
+                            {{user.realName}}
+                            <Button @click="quitLogin" type="text">退出登录</Button>
                         </Col>
                         <Col span="12" style="text-align: right">
                             <Icon type="md-notifications-outline" size="24"></Icon>
@@ -67,15 +40,25 @@
     import login from './views/login'
 
     export default {
-        name:'App',
-        components:{
+        name: 'App',
+        components: {
             login
         },
-        methods:{
-            quitLogin(){
-                this.$store.commit('setUser','');
+        data() {
+            return {
+                menuList:[]
             }
+        },
+        methods: {
+            quitLogin() {
+                this.$store.commit('setUser', '');
+            }
+        },
+        mounted() {
+            this.menuList = this.user.menuList;
+            console.log(this.menuList);
         }
+
     }
 </script>
 

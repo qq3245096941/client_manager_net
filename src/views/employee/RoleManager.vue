@@ -144,10 +144,20 @@
                 Reflect.set(this.roleForm, 'menuCodes', menuCodes);
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.request('/sysRole/insert', this.roleForm, 'post').then(data => {
-                            this.$Message.success('添加角色成功');
-                            this.cancelEdit();
-                        })
+                        /*添加或修改*/
+                        if(this.currentRole===''){
+                            this.request('/sysRole/insert', this.roleForm, 'post').then(data => {
+                                this.$Message.success('添加角色成功');
+                                this.cancelEdit();
+                            })
+                        }else{
+                            Reflect.set(this.roleForm,'roleId',this.currentRole);
+                            this.request('/sysRole/update',this.roleForm,'post').then(data=>{
+                                this.$Message.success('修改角色成功');
+                                this.cancelEdit();
+                            })
+                        }
+
                     } else {
                         this.$Message.error('表单错误，请检查表单');
                     }
@@ -166,12 +176,9 @@
                 this.getRoleList();
             },
             async getRoleList(currentRoleList = []) {
-
-
                 currentRoleList = currentRoleList.map(item => {
                     return Number.parseInt(item);
                 });
-
                 this.request('/sysMenu/userQuery').then(data => {
                     this.roleList = [];
                     const roleList = data.data;
@@ -202,8 +209,6 @@
 
                         this.roleList.push(parentObj);
                     });
-
-                    console.log(this.roleList);
                 })
             }
         },

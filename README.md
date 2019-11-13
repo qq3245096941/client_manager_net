@@ -27,3 +27,14 @@ this.request('/client/update', {
     }
 })
 ```
+
+### 监听v-for渲染完成
+```
+watch:{
+    employeeList() {
+        this.$nextTick(()=>{
+            //执行操作
+        })
+    }
+}
+```
