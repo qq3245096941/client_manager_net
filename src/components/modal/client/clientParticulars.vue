@@ -1,5 +1,10 @@
 <template>
-    <Modal :value="content.isOpen" :title="client.name" @on-cancel="cancel" @on-ok="content.isOpen = false">
+    <Modal :value="content.isOpen" :title="client.name" @on-cancel="cancel" @on-ok="content.isOpen = false" width="800">
+        <Tag type="dot" v-for="(label,index) in labelList" closable @on-close="labelDelete(label,index)" size="large"
+             :color="label.intentionOfIndicators.intentionOfIndicatorsType===1?'success':'error'">
+            {{label.intentionOfIndicators.intentionOfIndicatorsName}}({{label.intentionOfIndicators.intentionOfIndicatorsNum}}分)
+        </Tag>
+        <Divider />
         <Collapse accordion value="1">
             <Panel name="1">
                 基本信息
@@ -13,11 +18,6 @@
                         <Cell title="客户等级" :extra="client.lvName"/>
                         <Cell title="合作状态" :extra="client.cooperationStatus"/>
                         <Cell title="资产评估" :label="client.property"/>
-                        <Cell title="意向标签" :extra="labelList.length===0?'暂无意向标签':''"/>
-                        <Tag type="dot" v-for="(label,index) in labelList" closable @on-close="labelDelete(label,index)"
-                             :color="label.intentionOfIndicators.intentionOfIndicatorsType===1?'success':'error'">
-                            {{label.intentionOfIndicators.intentionOfIndicatorsName}}({{label.intentionOfIndicators.intentionOfIndicatorsNum}}分)
-                        </Tag>
                     </CellGroup>
                 </p>
             </Panel>
@@ -88,10 +88,7 @@
             /*标签删除*/
             labelDelete(label, index) {
                 if (confirm('确定删除吗?')) {
-                    this.request('/customerIntention/delete', {
-                        clientCode: this.client.clientCode,
-                        ids: label.intentionOfIndicatorsCode
-                    }).then(data => {
+                    this.request('/customerIntention/delete', {ids: label.customerIntentionCode}).then(data => {
                         this.labelList.splice(index, 1);
                         this.$Message.success('删除成功');
                     })

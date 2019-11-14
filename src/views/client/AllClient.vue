@@ -13,9 +13,10 @@
                     <BreadcrumbItem>所有客户</BreadcrumbItem>
                 </Breadcrumb>
             </p>
-            <clientSearch @search="searchClient"></clientSearch>
+            <clientSearch ref="clientSearch" @search="searchClient"></clientSearch>
 
-            <Table :loading="tableLoading" :columns="clientTable" height="520" :data="clientList"></Table>
+            <Table :row-class-name="rowClassName" :loading="tableLoading" :columns="clientTable" height="520"
+                   :data="clientList"></Table>
 
             <Divider dashed/>
             <Page :total="pages.total" show-sizer :current.sync="pages.index" :page-size="pages.limit"
@@ -60,25 +61,31 @@
                 },
                 clientTable: [
                     {
+                        title: '开发状态',
+                        key: 'cooperationStatus',
+                        width: 100
+                    },
+                    {
                         title: '姓名',
                         key: 'name',
                         width: 100
                     },
                     {
-                        title: '电话',
-                        key: 'phone',
+                        title: '微信号',
+                        key: 'wxNum',
                         width: 130
                     },
                     {
                         title: '攻略进度',
                         key: 'schedule',
+                        sortable: true,
                         width: 200,
                         render: (h, params) => {
                             return h('div', {}, [
                                 h('Progress', {
                                     props: {
                                         status: 'active',
-                                        percent: params.row.schedule,
+                                        percent: this.getClientPercent(params.row.schedule),
                                     },
                                 }),
                                 h('Button', {
@@ -98,28 +105,37 @@
                         }
                     },
                     {
+                        title: '等级',
+                        key: 'lvName',
+                        width: 100
+                    },
+                    {
                         title: '添加时间',
                         key: 'createTime',
+                        sortable: true,
                         width: 150
                     },
                     {
-                        title: '最后回访时间',
+                        title: '最后跟进时间',
                         key: 'lastReturnTime',
                         width: 200
                     },
                     {
                         title: "开发人",
-                        key: 'sysUserName'
+                        key: 'sysUserName',
+                        width: 100
                     },
                     {
                         title: '操作',
                         key: 'option',
-                        width: 350,
+                        fixed: 'right',
+                        width: 280,
                         render: (h, params) => {
                             return h('ButtonGroup', {
                                     props: {
                                         type: 'button',
-                                        shape: 'circle'
+                                        shape: 'circle',
+                                        size: 'small'
                                     },
                                 },
                                 [
@@ -140,6 +156,9 @@
                                         {
                                             props: {
                                                 type: 'warning'
+                                            },
+                                            style: {
+                                                display: this.user.userType === 3 || this.user.userType === 2 ? 'block' : 'none'
                                             },
                                             on: {
                                                 click: () => {
@@ -233,6 +252,29 @@
                 }
         },
         methods: {
+            /*通过开发状态，给表格每行设置颜色*/
+            rowClassName(row, index) {
+                if (row.cooperationStatus === '开发中') {
+                    return 'table-info-row';
+                }
+
+                if (row.cooperationStatus === '合作成功') {
+                    return 'table-success-row';
+                }
+
+                return 'table-error-row';
+
+            },
+            /*计算客户的进度*/
+            getClientPercent(schedule) {
+                if (schedule > 100) {
+                    return 100;
+                }
+                if (schedule < 0) {
+                    return 0;
+                }
+                return schedule;
+            },
             /*搜索后返回的数据*/
             searchClient(data) {
                 Reflect.set(this.pages, 'total', data.total);
@@ -253,7 +295,6 @@
                     limit: this.pages.limit,
                 };
 
-
                 switch (this.user.userType) {
                     case 2:
                         Reflect.set(obj, 'departmentCode', this.user.parentCode);
@@ -262,8 +303,8 @@
                         Reflect.set(obj, 'sysUserCode', this.user.userCode);
                         break;
                     case 4:
-                        Reflect.set(obj,'userType',4);
-                        Reflect.set(obj,'bossId',this.user.userCode);
+                        Reflect.set(obj, 'userType', 4);
+                        Reflect.set(obj, 'bossId', this.user.userCode);
                         break;
                 }
 
@@ -283,5 +324,18 @@
 </script>
 
 <style scoped>
+    .ivu-table .table-success-row td {
+        background-color: #19be6b;
+        color: #fff;
+    }
 
+    .ivu-table .table-info-row td {
+        background-color: #ff9900;
+        color: #fff;
+    }
+
+    .ivu-table .table-error-row td {
+        background-color: #ed4014;
+        color: #fff;
+    }
 </style>

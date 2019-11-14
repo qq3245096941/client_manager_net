@@ -11,7 +11,7 @@
                 <Card class="card" :style="{background:label.intentionOfIndicatorsType===1?'#19be6b':'#ed4014'}">
                     <h1>{{label.intentionOfIndicatorsNum}}分</h1>
                     <p>{{label.intentionOfIndicatorsName}}</p>
-                    <ButtonGroup size="small">
+                    <ButtonGroup size="small" v-show="user.userType!==3">
                         <Button shape="circle" icon="ios-brush"
                                 @click="editLabel(label.intentionOfIndicatorsCode)"></Button>
                         <Button shape="circle" icon="md-trash"

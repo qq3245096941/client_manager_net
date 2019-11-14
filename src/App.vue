@@ -3,14 +3,18 @@
         <login v-if="user===''"></login>
         <Layout :style="{minHeight: '100vh'}" v-else>
             <Sider collapsible :collapsed-width="78">
-                <Menu theme="dark" width="auto" accordion>
-                    <Submenu v-show="parentMenu.isShow===1" v-for="(parentMenu,index) in menuList" :name="index" :key="index">
+                <Menu theme="dark" :active-name="active" width="auto" accordion ref="menu" :open-names="open">
+                    <Submenu v-show="parentMenu.isShow===1" v-for="(parentMenu,index) in menuList" :name="index"
+                             :key="index">
                         <template slot="title">
                             <Icon :type="parentMenu.ext2"/>
                             {{parentMenu.menuName}}
                         </template>
-                        <MenuItem v-show="childrenMenu.isShow===1" v-for="(childrenMenu,childIndex) in parentMenu.sonList" :name="index+'-'+childIndex"
-                                  :to="childrenMenu.redirectUrl">{{childrenMenu.menuName}}</MenuItem>
+                        <MenuItem v-show="childrenMenu.isShow===1"
+                                  v-for="(childrenMenu,childIndex) in parentMenu.sonList"
+                                  :name="index+'-'+childIndex"
+                                  :to="childrenMenu.redirectUrl">{{childrenMenu.menuName}}
+                        </MenuItem>
                     </Submenu>
                 </Menu>
             </Sider>
@@ -46,7 +50,29 @@
         },
         data() {
             return {
-                menuList:[]
+                menuList: [],
+                currentPath: '',
+                active: '', //选中的子菜单
+                open: []  //展开的菜单，必须是数组
+            }
+        },
+        watch: {
+            $route(to, from) {
+                this.currentPath = to.path;
+            },
+            currentPath(path) {
+                this.menuList.forEach((parent, parentIndex) => {
+                    parent.sonList.forEach((children, childrenIndex) => {
+                        if (children.redirectUrl === path) {
+                            this.open = [parentIndex];
+                            this.active = `${parentIndex}-${childrenIndex}`;
+                        }
+                    })
+                });
+                this.$nextTick(() => {
+                    this.$refs.menu.updateOpened();
+                    this.$refs.menu.updateActiveName();
+                });
             }
         },
         methods: {
@@ -56,9 +82,8 @@
         },
         mounted() {
             this.menuList = this.user.menuList;
-            console.log(this.menuList);
+            this.currentPath = this.$route.path;
         }
-
     }
 </script>
 

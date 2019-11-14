@@ -8,10 +8,10 @@
             </Breadcrumb>
         </p>
 
-        <Tabs :animated="false" @on-click="selectDept">
+        <Tabs :value="currentDeptCode" :animated="false" @on-click="selectDept">
             <TabPane v-for="(dept,index) in deptList" :name="dept.departmentCode"
                      :label="dept.departmentName" :key="index">
-                <div :id="'main'+dept.departmentCode" style="width: 600px;height:200px;"></div>
+                <div :id="'main'+dept.departmentCode" style="width: 600px;height:300px;"></div>
             </TabPane>
         </Tabs>
     </Card>
@@ -23,13 +23,13 @@
         data() {
             return {
                 deptList: [],
-
+                currentDeptCode:''
             }
         },
         methods: {
             async selectDept(code) {
+                this.currentDeptCode = code;
 
-                console.log($(`#main${code}`));
                 let list = [];
                 let data = [];
 
@@ -38,8 +38,6 @@
                     parentCode: code,
                     userType:3
                 })).data;
-
-                console.log(employeeList);
 
                 for(let employee of employeeList){
                     list.push(employee.realName);
@@ -91,10 +89,20 @@
             }
         },
         mounted() {
+            this.$Notice.info({
+                duration:0,
+                title:'提示',
+                desc: '任务总览不会显示未分配任务的部门，请管理员对未分配任务的部门进行分配'
+            });
+
+            /*过滤掉没有分配任务的部门*/
             this.request('/department/query', {type: 1}).then(data => {
                 this.deptList = data.data.filter(item => {
                     return item.status === 2;
-                })
+                });
+
+                this.currentDeptCode = this.deptList[0].departmentCode;
+                this.selectDept(this.currentDeptCode);
             })
         }
     }

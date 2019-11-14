@@ -6,6 +6,7 @@
                 <BreadcrumbItem>技能分析</BreadcrumbItem>
             </Breadcrumb>
         </p>
+        <Alert show-icon type="success">请选择一名员工，以开始技能分析</Alert>
         <Row>
             <Col span="8">
                 <Form :label-width="80">
@@ -14,7 +15,7 @@
                         <Row>
                             <Col span="11">
                                 <Select v-model="selectDept">
-                                    <Option v-for="(dept,index) in deptList" :value="dept.departmentCode"
+                                    <Option v-for="(dept,index) in deptList" :value="dept.departmentCode" :disabled="user.userType===3"
                                             :key="index">
                                         {{dept.departmentName}}
                                     </Option>
@@ -23,7 +24,7 @@
                             <Col span="2" style="text-align: center">-</Col>
                             <Col span="11">
                                 <Select v-model="selectEmployee">
-                                    <Option v-for="(employee,index) in currentEmployeeList" :value="employee.userCode"
+                                    <Option v-for="(employee,index) in currentEmployeeList" :value="employee.userCode" v-show="employee.userType!==4"
                                             :key="index">
                                         {{employee.realName}}
                                     </Option>
@@ -114,7 +115,6 @@
                 echarts.init(document.getElementById('main'), 'macarons').setOption({
                     title: {
                         text: name,
-                        subtext: '纯属虚构'
                     },
                     tooltip: {
                         trigger: 'item',
@@ -178,8 +178,6 @@
             this.request('/department/query').then(data => {
                 this.deptList = data.data;
             });
-
-            this.funnelMap();
         }
     }
 </script>

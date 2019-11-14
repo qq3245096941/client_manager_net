@@ -3,7 +3,7 @@
         <p slot="title">
             <Breadcrumb>
                 <BreadcrumbItem>客户管理</BreadcrumbItem>
-                <BreadcrumbItem>添加客服</BreadcrumbItem>
+                <BreadcrumbItem>添加客户</BreadcrumbItem>
             </Breadcrumb>
         </p>
         <Row>
@@ -29,8 +29,8 @@
                     <FormItem label="地址" prop="address">
                         <Input placeholder="地址尽量详细些" v-model="clientForm.address"></Input>
                     </FormItem>
-                    <FormItem label="收入">
-                        <Input v-model="clientForm.income"></Input>
+                    <FormItem label="资产评估">
+                        <Input v-model="clientForm.property"></Input>
                     </FormItem>
                     <FormItem label="客户等级" prop="lvCode">
                         <Row>
@@ -53,7 +53,7 @@
                             </Col>
                         </Row>
                     </FormItem>
-                    <FormItem label="选择员工" prop="sysUserCode">
+                    <FormItem label="选择员工" :prop="user.userType===3?'':'sysUserCode'" v-show="user.userType!==3">
                         <Row>
                             <Col span="12">
                                 <Select v-model="clientForm.sysUserCode">
@@ -66,9 +66,9 @@
                             </Col>
                         </Row>
                     </FormItem>
-                    <FormItem label="资产评估">
+                    <FormItem label="描述">
                         <Input type="textarea" :autosize="{minRows: 4,maxRows: 5}"
-                               v-model="clientForm.property"></Input>
+                               v-model="clientForm.work"></Input>
                     </FormItem>
                     <!-- 提交 -->
                     <FormItem>
@@ -85,9 +85,7 @@
         name: "AddClient",
         data() {
             const validatePhone = (rule, value, callback) => {
-                if (!value) {
-                    return callback(new Error('手机号不能为空'));
-                } else if (!/^1[34578]\d{9}$/.test(value)) {
+                if (!/^1[34578]\d{9}$/.test(value)) {
                     callback('手机号格式不正确');
                 } else {
                     callback();
@@ -99,7 +97,7 @@
                     phone: '',
                     wxNum: '',
                     address: '',
-                    income: '',
+                    work: '',
                     lvCode: '',
                     cooperationStatus: '',
                     sysUserCode: '',
@@ -111,11 +109,11 @@
                         message: '客户名称不能为空',
                         trigger: 'blur'
                     },
-                    phone:
+                    phone:[
                         {
-                            required: true,
                             validator: validatePhone,
-                        },
+                        }
+                    ],
                     wxNum:
                         {
                             required: true,
@@ -158,6 +156,8 @@
         },
         methods: {
             submit(name) {
+                Reflect.set(this.clientForm, 'sysUserCode', this.user.userCode);
+
                 this.$refs[name].validate((valid) => {
                     if (valid) {
                         if (this.$route.query.code === undefined) {
@@ -216,7 +216,7 @@
             /*当前部门的员工*/
             this.request('/sysUser/query', {
                 parentCode: this.user.parentCode,
-                userType:3
+                userType: 3
             }).then(data => {
                 this.employeeList = data.data;
             })

@@ -35,6 +35,9 @@
                                     props: {
                                         type: 'success',
                                     },
+                                    style:{
+                                      display:this.user.userType===3?'none':'block'
+                                    },
                                     on: {
                                         click: () => {
                                             this.$router.push({path: '/AddClass', query: {code: param.row.lvCode}});
@@ -44,6 +47,9 @@
                                 h('Button', {
                                     props: {
                                         type: 'error'
+                                    },
+                                    style:{
+                                        display:this.user.userType===3?'none':'block'
                                     },
                                     on: {
                                         click: () => {

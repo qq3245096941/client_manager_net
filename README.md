@@ -38,3 +38,12 @@ watch:{
     }
 }
 ```
+
+### 监听路由变化
+```
+watch:{
+  $route(to,from){
+    console.log(to.path);
+  }
+},
+```

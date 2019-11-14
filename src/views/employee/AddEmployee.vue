@@ -34,8 +34,8 @@
                     </FormItem>
 
                     <!--如果是其他职能选择一个部门-->
-                    <FormItem label="选择部门" :prop="employeeForm.userType===2?'parentCode':''"
-                              v-show="employeeForm.userType===2">
+                    <FormItem label="选择部门" :prop="employeeForm.userType!==4?'parentCode':''"
+                              v-show="employeeForm.userType!==4">
                         <Select placeholder="选择部门" v-model="employeeForm.parentCode">
                             <Option v-for="(dept,index) in deptAll" :value="dept.departmentCode" :key="index">
                                 {{dept.departmentName}}
@@ -72,6 +72,15 @@
     export default {
         name: "AddEmployee",
         data() {
+            const validatePhone = (rule, value, callback) => {
+                if (!value) {
+                    return callback(new Error('手机号不能为空'));
+                } else if (!/^1[34578]\d{9}$/.test(value)) {
+                    callback('手机号格式不正确');
+                } else {
+                    callback();
+                }
+            };
             return {
                 employeeForm: {
                     realName: '',
@@ -101,8 +110,7 @@
                         message: '请选择角色',
                     },
                     nickName: {
-                        required: true,
-                        message: '请输入账号'
+                        validator: validatePhone,
                     },
                     passWord: {
                         required: true,

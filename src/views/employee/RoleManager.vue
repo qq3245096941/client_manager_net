@@ -32,7 +32,6 @@
                             <Button type="primary" @click="submit('roleForm')">{{currentRole===''?'添加':'修改'}}</Button>
                             <Button @click="cancelEdit" v-show="currentRole!==''">撤销修改</Button>
                         </ButtonGroup>
-
                     </FormItem>
                 </Form>
             </Col>
@@ -137,9 +136,11 @@
         },
         methods: {
             submit(name) {
-                let menuCodes = this.$refs['tree'].getCheckedNodes().map(item => {
+                let menuCodes = this.$refs['tree'].getCheckedAndIndeterminateNodes().map(item => {
                     return item.code
                 }).join(',');
+
+                console.log(menuCodes);
 
                 Reflect.set(this.roleForm, 'menuCodes', menuCodes);
                 this.$refs[name].validate((valid) => {

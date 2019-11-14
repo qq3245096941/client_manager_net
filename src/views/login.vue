@@ -52,6 +52,9 @@
                             /*提交user到仓库*/
                             this.$store.commit('setUser',data.data);
                             this.loading = false;
+                            this.$router.push({path:'/AllClient'});
+                            window.location.reload();
+
                         })
                     } else {
                         this.$Message.error('登录失败');

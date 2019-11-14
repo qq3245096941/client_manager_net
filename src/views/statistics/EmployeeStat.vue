@@ -13,7 +13,7 @@
             </TabPane>
             <TabPane label="类型统计">
                 <Row>
-                    <Col span="6" v-for="(dept,index) in deptDrawList" :key="index">
+                    <Col span="8" v-for="(dept,index) in deptDrawList" :key="index">
                         <div :id="'main'+index" style="width: 100%;height: 300px;padding: 5px"></div>
                     </Col>
                 </Row>

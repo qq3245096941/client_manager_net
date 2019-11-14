@@ -11,6 +11,13 @@ export default {
                                  {value: 400, name: '组5'}
          */
         drawPie: () => (id, title, data = []) => {
+            data = data.map(item=>{
+                return {
+                    value:item.value,
+                    name:`${item.name}(${item.value}个)`
+                }
+            });
+
             echarts.init(document.getElementById(id), 'macarons').setOption({
                 title: {
                     text: title,
@@ -19,7 +26,9 @@ export default {
                 },
                 tooltip: {
                     trigger: 'item',
-                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    formatter(val) {
+                        return `${val.data.name}<br/>客户量：${val.data.value}<br/>占比：${val.percent}%`
+                    }
                 },
                 series: [
                     {

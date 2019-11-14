@@ -7,21 +7,17 @@
                     {{employee.realName}}
                     <div slot="content">
                         <CellGroup>
-                            <Cell :title="employee.nickName" label="账号" name="username">
-                                <Button slot="extra">点击复制</Button>
-                            </Cell>
-                            <Cell :title="employee.passWord" label="密码" name="password">
-                                <Button slot="extra">点击复制</Button>
-                            </Cell>
+                            <Cell v-show="user.userType===1" :title="employee.nickName" label="账号" name="username"></Cell>
+                            <Cell v-show="user.userType===1" :title="employee.passWord" label="密码" name="password"></Cell>
                             <Cell title="姓名">
                                 <Tag checkable slot="extra" color="primary">{{employee.realName}}</Tag>
                             </Cell>
                             <Cell title="加入时间" :extra="employee.createTime"/>
                             <Cell title="角色" :extra="employee.roleName"/>
                             <Cell title="人员类型" :extra="employee.userType"/>
-                            <Cell title="操作">
+                            <Cell title="操作" v-show="user.userType===1">
                                 <ButtonGroup slot="extra">
-                                    <Button type="text" @click="deleteEmployee(employee.userCode)">删除</Button>
+                                    <Button type="error" @click="deleteEmployee(employee.userCode)">删除</Button>
                                     <Button type="success" @click="editEmployee(employee.userCode)">修改</Button>
                                 </ButtonGroup>
                             </Cell>
@@ -66,6 +62,13 @@
             },
             deleteEmployee(code) {
                 if (!confirm('确定删除吗?')) return;
+
+                this.request('/sysUser/delete',{
+                    ids:code
+                }).then(data=>{
+                    window.location.reload();
+                    this.$Message.success('删除成功');
+                })
             },
             /*点击叶节点进入员工详情*/
             treeClick(param) {
@@ -123,6 +126,5 @@
 </script>
 
 <style scoped>
-
 
 </style>
