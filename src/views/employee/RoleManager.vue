@@ -3,7 +3,7 @@
         <p slot="title">
             <Breadcrumb>
                 <BreadcrumbItem>员工管理</BreadcrumbItem>
-                <BreadcrumbItem>所有角色</BreadcrumbItem>
+                <BreadcrumbItem>角色权限</BreadcrumbItem>
             </Breadcrumb>
         </p>
 
@@ -12,7 +12,7 @@
                 <Table :columns="columns" :data="allRoleList"></Table>
             </Col>
             <Col span="12" style="padding: 10px">
-                <Alert v-show="currentRole!==''">正在修改角色：{{roleForm.roleName}}</Alert>
+                <Alert v-show="currentRole!==''">正在修改角色权限：{{roleForm.roleName}}</Alert>
                 <Form :label-width="80" :model="roleForm" ref="roleForm" :rules="roleRule">
                     <FormItem label="角色名称" prop="roleName">
                         <Input v-model="roleForm.roleName"></Input>
@@ -29,7 +29,7 @@
 
                     <FormItem>
                         <ButtonGroup>
-                            <Button type="primary" @click="submit('roleForm')">{{currentRole===''?'添加':'修改'}}</Button>
+                            <Button type="primary" @click="submit('roleForm')">{{currentRole===''?'添加':'保存修改'}}</Button>
                             <Button @click="cancelEdit" v-show="currentRole!==''">撤销修改</Button>
                         </ButtonGroup>
                     </FormItem>
@@ -103,8 +103,6 @@
                                             }).then(data => {
                                                 this.getRoleList(data.data.menuCodes.split(','));
                                             });
-
-
                                         }
                                     }
                                 }, '修改'),

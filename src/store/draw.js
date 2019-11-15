@@ -11,6 +11,13 @@ export default {
                                  {value: 400, name: '组5'}
          */
         drawPie: () => (id, title, data = []) => {
+            /*统计总数*/
+            let count = data.map(item=>{
+                return item.value
+            }).reduce((previousValue,currentValue)=>{
+                return previousValue+currentValue;
+            });
+
             data = data.map(item=>{
                 return {
                     value:item.value,
@@ -20,7 +27,7 @@ export default {
 
             echarts.init(document.getElementById(id), 'macarons').setOption({
                 title: {
-                    text: title,
+                    text: `${title}(${count}个)`,
                     left: 'center',
                     top: 20,
                 },
@@ -34,14 +41,12 @@ export default {
                     {
                         name: '客户量',
                         type: 'pie',
-                        radius: '55%',
-                        center: ['50%', '50%'],
+                        radius: ['30%', '60%'],
                         data: [
                             ...data
                         ].sort(function (a, b) {
                             return a.value - b.value;
                         }),
-                        roseType: 'radius',
                         labelLine: {
                             normal: {
                                 smooth: 0.2,

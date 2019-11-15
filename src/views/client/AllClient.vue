@@ -13,14 +13,21 @@
                     <BreadcrumbItem>所有客户</BreadcrumbItem>
                 </Breadcrumb>
             </p>
+            <Alert type="warning" v-show="user.userType!==1&&currentGroupTask.length>0">
+                本周任务：<br>
+                <template v-for="(task,index) in currentGroupTask">
+                    {{task.deptName}}目标微信量：
+                    <Tag checkable color="error">{{task.rwWXNum}}</Tag>， 已完成微信量
+                    <Tag checkable color="success">{{task.WXNum}}</Tag>
+                    <br>
+                </template>
+            </Alert>
+            <Alert type="error" v-show="currentGroupTask.length===0&&user.userType!==1">本周暂未分配任务</Alert>
+
             <clientSearch ref="clientSearch" @search="searchClient"></clientSearch>
 
             <Table :row-class-name="rowClassName" :loading="tableLoading" :columns="clientTable" height="520"
                    :data="clientList"></Table>
-
-            <Divider dashed/>
-            <Page :total="pages.total" show-sizer :current.sync="pages.index" :page-size="pages.limit"
-                  @on-page-size-change="getLimit"/>
         </Card>
     </div>
 </template>
@@ -76,7 +83,7 @@
                         width: 130
                     },
                     {
-                        title: '攻略进度',
+                        title: '意向度',
                         key: 'schedule',
                         sortable: true,
                         width: 200,
@@ -205,7 +212,7 @@
                                                 type: 'error'
                                             },
                                             style: {
-                                                display: this.user.userType !== 1 ? 'inline' : 'none'
+                                                display: this.user.userType === 2 || this.user.userType === 4 ? 'inline' : 'none'
                                             },
                                             on: {
                                                 click: () => {
@@ -230,16 +237,12 @@
                         }
                     }
                 ],
+                /*客户列表*/
                 clientList: [],
-                /*分页数据*/
-                pages: {
-                    /*总条数*/
-                    total: 0,
-                    index: 1,
-                    limit: 10
-                },
                 /*表格是否加载中*/
-                tableLoading: false
+                tableLoading: false,
+                /*组任务情况，如果是经理，则有多个组*/
+                currentGroupTask: []
             }
         },
         watch: {
@@ -257,13 +260,10 @@
                 if (row.cooperationStatus === '开发中') {
                     return 'table-info-row';
                 }
-
                 if (row.cooperationStatus === '合作成功') {
                     return 'table-success-row';
                 }
-
                 return 'table-error-row';
-
             },
             /*计算客户的进度*/
             getClientPercent(schedule) {
@@ -277,22 +277,17 @@
             },
             /*搜索后返回的数据*/
             searchClient(data) {
-                Reflect.set(this.pages, 'total', data.total);
                 this.clientList = data.data.map(item => {
                     return this.$store.getters.tidyClient(item);
                 });
-            },
-            getLimit(limit) {
-                Reflect.set(this.pages, 'limit', limit);
-                this.getClientList();
             },
             /*获取客户列表*/
             getClientList() {
                 this.tableLoading = true;
 
                 let obj = {
-                    page: this.pages.index,
-                    limit: this.pages.limit,
+                    page: 1,
+                    limit: 10000000,
                 };
 
                 switch (this.user.userType) {
@@ -309,16 +304,55 @@
                 }
 
                 this.request('/client/query', obj).then(data => {
-                    Reflect.set(this.pages, 'total', data.total);
                     this.tableLoading = false;
                     this.clientList = data.data.map(item => {
                         return this.$store.getters.tidyClient(item);
                     });
                 });
+            },
+            async getGroupsTask() {
+                /*获取员工所在本组的任务情况，经理有多个组的情况*/
+                switch (this.user.userType) {
+                    case 2:
+                    case 3:
+                        let obj = {};
+                        let dept = (await this.request('/department/queryOne', {id: this.user.parentCode})).data;
+                        let task = (await this.request('/mission/week', {
+                            id: this.user.parentCode,
+                            type: 2,
+                            weekType: 2
+                        })).data;
+                        Reflect.set(obj, 'deptName', dept.departmentName);
+                        Reflect.set(obj, 'rwWXNum', task.rwWXNum);
+                        Reflect.set(obj, 'WXNum', task.WXNum);
+                        this.currentGroupTask.push(obj);
+                        console.log(this.currentGroupTask);
+                        break;
+                    case 4:
+                        let deptList = this.user.parentCode.split(',');
+                        deptList.forEach(item => {
+                            let obj = {};
+                            this.request('/department/queryOne', {id: item}).then(data => {
+                                Reflect.set(obj, 'deptName', data.data.departmentName);
+                            });
+                            this.request('/mission/week', {
+                                id: item,
+                                type: 2,
+                                weekType: 2
+                            }).then(data => {
+                                Reflect.set(obj, 'rwWXNum', data.data.rwWXNum);
+                                Reflect.set(obj, 'WXNum', data.data.WXNum);
+                                this.currentGroupTask.push(obj);
+                            });
+                        });
+                        break;
+                }
             }
         },
         mounted() {
             this.getClientList();
+            /*获取组的任务情况*/
+            this.getGroupsTask();
         }
     }
 </script>

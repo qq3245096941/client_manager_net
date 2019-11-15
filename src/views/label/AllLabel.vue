@@ -7,7 +7,7 @@
             </Breadcrumb>
         </p>
         <Row :gutter="8">
-            <Col v-for="(label,index) in labelList" span="3" :key="index" >
+            <Col v-for="(label,index) in labelList" style="margin-bottom: 5px" span="3" :key="index" >
                 <Card class="card" :style="{background:label.intentionOfIndicatorsType===1?'#19be6b':'#ed4014'}">
                     <h1>{{label.intentionOfIndicatorsNum}}分</h1>
                     <p>{{label.intentionOfIndicatorsName}}</p>

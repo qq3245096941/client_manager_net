@@ -156,6 +156,8 @@
         methods: {
             search() {
                 this.isLoading = true;
+                Reflect.set(this.searchFrom,'page',1);
+                Reflect.set(this.searchFrom,'limit',1000000);
                 this.request('/client/query', this.searchFrom).then(data => {
                     this.isLoading = false;
                     this.$Message.success(`搜索完成，总共搜索到${data.data.length}条数据`);
@@ -172,7 +174,6 @@
             }
         },
         async mounted() {
-
             this.request('/lv/query').then(data => {
                 this.classList = data.data;
             });

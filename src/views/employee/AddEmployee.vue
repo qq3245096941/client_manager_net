@@ -44,7 +44,7 @@
                     </FormItem>
 
                     <FormItem label="选择角色" prop="userRoleId">
-                        <Select placeholder="选择角色" v-model="employeeForm.userRoleId">
+                        <Select placeholder="选择权限" v-model="employeeForm.userRoleId">
                             <Option v-show="role.roleId!==0" v-for="(role,index) in roleAll" :value="role.roleId+''"
                                     :key="index">{{role.roleName}}
                             </Option>

@@ -17,13 +17,15 @@
                         <Cell title="收入情况" :extra="client.income"/>
                         <Cell title="客户等级" :extra="client.lvName"/>
                         <Cell title="合作状态" :extra="client.cooperationStatus"/>
+                        <Cell title="合作金额" v-show="client.cooperationStatus===1" :extra="client.amountOfCooperation+''"></Cell>
                         <Cell title="资产评估" :label="client.property"/>
+                        <Cell :title="client.work" label="描述" />
                     </CellGroup>
                 </p>
             </Panel>
 
             <Panel name="2">
-                回访记录
+                跟进记录
                 <div slot="content">
                     <Timeline>
                         <TimelineItem v-for="(visit,index) in returnVisit" :key="index">
@@ -64,7 +66,6 @@
                         }).then(data => {
                             this.client = this.$store.getters.tidyClient(data.data);
                             this.labelList = this.client.customerIntention;
-                            console.log(this.labelList);
                         });
 
                         this.request('/returnVisitToRecord/query', {

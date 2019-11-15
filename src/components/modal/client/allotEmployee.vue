@@ -13,7 +13,8 @@
 
                     <FormItem label="员工">
                         <Select v-model="selectEmployee">
-                            <Option v-for="(employee,index) in employeeList" :value="employee.userCode" :key="index">
+                            <Option v-show="employee.userType!==4" v-for="(employee,index) in employeeList"
+                                    :value="employee.userCode" :key="index">
                                 {{employee.realName}}
                             </Option>
                         </Select>
@@ -64,7 +65,7 @@
                 this.content.isOpen = false;
             },
             submit() {
-                if (this.selectEmployee === '') {
+                if (this.selectEmployee === '' || this.selectEmployee === undefined) {
                     this.$Message.error('未选择任何员工');
                     this.loading = false;
                     return;

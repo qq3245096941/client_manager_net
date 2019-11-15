@@ -53,6 +53,16 @@
                             </Col>
                         </Row>
                     </FormItem>
+                    <!--合作金额-->
+                    <FormItem label="合作金额" v-show="clientForm.cooperationStatus==='1'">
+                        <Row>
+                            <Col span="12">
+                                <Input v-model="clientForm.amountOfCooperation">
+                                    <span slot="append">万</span>
+                                </Input>
+                            </Col>
+                        </Row>
+                    </FormItem>
                     <FormItem label="选择员工" :prop="user.userType===3?'':'sysUserCode'" v-show="user.userType!==3">
                         <Row>
                             <Col span="12">
@@ -72,7 +82,7 @@
                     </FormItem>
                     <!-- 提交 -->
                     <FormItem>
-                        <Button type="primary" @click="submit('clientForm')">提交</Button>
+                        <Button :disabled="isDisabledButton" type="primary" @click="submit('clientForm')">提交</Button>
                     </FormItem>
                 </Form>
             </Col>
@@ -85,6 +95,9 @@
         name: "AddClient",
         data() {
             const validatePhone = (rule, value, callback) => {
+                if (value === '') {
+                    callback();
+                }
                 if (!/^1[34578]\d{9}$/.test(value)) {
                     callback('手机号格式不正确');
                 } else {
@@ -101,50 +114,46 @@
                     lvCode: '',
                     cooperationStatus: '',
                     sysUserCode: '',
-                    property: ''
+                    property: '',
+                    /*选择合作成功时，可做的金额*/
+                    amountOfCooperation: ''
                 },
+                isDisabledButton:false,
                 clientRules: {
                     name: {
                         required: true,
                         message: '客户名称不能为空',
                         trigger: 'blur'
                     },
-                    phone:[
-                        {
-                            validator: validatePhone,
-                        }
-                    ],
-                    wxNum:
-                        {
-                            required: true,
-                            message: '请输入微信号',
-                            trigger: 'blur'
-                        },
-                    address:
-                        {
-                            required: true,
-                            message: '地址必须填写',
-                            trigger: 'blur'
-                        },
-                    lvCode:
-                        {
-                            required: true,
-                            message: '客户等级必须选择',
-                            trigger: 'blur'
-                        },
-                    cooperationStatus:
-                        {
-                            required: true,
-                            message: '合作状态必须选择',
-                            trigger: 'blur'
-                        },
-                    sysUserCode:
-                        {
-                            required: true,
-                            message: '请选择员工',
-                            trigger: 'blur'
-                        }
-
+                    phone: {
+                        validator: validatePhone,
+                        trigger: 'blur'
+                    },
+                    wxNum: {
+                        required: true,
+                        message: '请输入微信号',
+                        trigger: 'blur'
+                    },
+                    address: {
+                        required: true,
+                        message: '地址必须填写',
+                        trigger: 'blur'
+                    },
+                    lvCode: {
+                        required: true,
+                        message: '客户等级必须选择',
+                        trigger: 'blur'
+                    },
+                    cooperationStatus: {
+                        required: true,
+                        message: '合作状态必须选择',
+                        trigger: 'blur'
+                    },
+                    sysUserCode: {
+                        required: true,
+                        message: '请选择员工',
+                        trigger: 'blur'
+                    }
                 },
                 /*部门列表*/
                 deptList: [],
@@ -156,6 +165,13 @@
         },
         methods: {
             submit(name) {
+                this.isDisabledButton = true;
+                if(this.clientForm.cooperationStatus==='1'&&this.clientForm.amountOfCooperation===''){
+                    this.$Message.error('必须填写合作金额');
+                    this.isDisabledButton = false;
+                    return;
+                }
+
                 Reflect.set(this.clientForm, 'sysUserCode', this.user.userCode);
 
                 this.$refs[name].validate((valid) => {

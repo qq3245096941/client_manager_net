@@ -22,7 +22,7 @@ export default new Vuex.Store({
         }
     })],
     state: {
-        rootUrl: 'http://192.168.0.139:8081',
+        rootUrl: 'http://www.51tmeng.com/wxClient',
         user: ''
     },
     mutations: {

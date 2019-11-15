@@ -70,12 +70,12 @@
                     this.$Message.success('删除成功');
                 })
             },
-            /*点击叶节点进入员工详情*/
+            /*点击节点进入员工详情*/
             treeClick(param) {
+                if (param.data.code === null) return;
+
                 this.userData = [];
                 this.isOpen = true;
-
-                if (param.data.code === null) return;
 
                 const employeeCodeList = param.data.code.split(',');
                 for (let code of employeeCodeList) {

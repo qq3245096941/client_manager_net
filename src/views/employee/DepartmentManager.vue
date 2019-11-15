@@ -110,6 +110,8 @@
                                                 if (data.succeed === 1) {
                                                     this.deptList.splice(param.index, 1);
                                                     this.$Message.success('删除成功');
+                                                }else{
+                                                    this.$Message.error(data.message);
                                                 }
                                             })
                                         }

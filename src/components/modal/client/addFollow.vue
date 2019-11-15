@@ -1,6 +1,6 @@
 <!--添加跟进-->
 <template>
-    <Modal :value="content.isOpen" title="添加回访" @on-cancel="cancel" @on-ok="submit" :loading="loading">
+    <Modal :value="content.isOpen" title="添加跟进" @on-cancel="cancel" @on-ok="submit" :loading="loading">
         <Form :label-width="80">
             <FormItem label="备注">
                 <Input v-model="desc" type="textarea" :autosize="{minRows: 5,maxRows: 10}"></Input>

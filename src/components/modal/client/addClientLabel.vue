@@ -56,10 +56,10 @@
             enter() {
                 /*去掉用户已经存在的标签，然后插入*/
                 this.clickList = this.clickList.filter(item => {
-                    return this.userLabelList.find(userLabel => item === userLabel) === item?'':item;
+                    return this.userLabelList.find(userLabel => item === userLabel) === item ? '' : item;
                 });
 
-                if(this.clickList.length===0){
+                if (this.clickList.length === 0) {
                     this.$Message.error('您未选择任何标签');
                     this.content.isOpen = false;
                     return;

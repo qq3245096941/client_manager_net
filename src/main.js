@@ -17,16 +17,18 @@ Vue.mixin({
     methods: {
         //ajax请求
         request(url, data, method = 'get') {
+            this.$Loading.start();
             return new Promise((resolve) => {
                 $.ajax({
                     url: this.$store.state.rootUrl + url,
                     data,
                     method,
-                    success(res) {
+                    success: (res) => {
                         resolve(res);
+                        this.$Loading.finish();
                     },
-                    error(err) {
-                        console.log(err);
+                    error: (err) => {
+                        this.$Loading.error();
                     }
                 });
             })

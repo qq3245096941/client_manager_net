@@ -6,26 +6,24 @@
                 <BreadcrumbItem>技能分析</BreadcrumbItem>
             </Breadcrumb>
         </p>
-        <Alert show-icon type="success">请选择一名员工，以开始技能分析</Alert>
+        <Alert show-icon>只选择部门则进行部门技能分析，选择员工开启员工技能分析</Alert>
         <Row>
             <Col span="8">
                 <Form :label-width="80">
-                    <!--分数区间-->
                     <FormItem label="选择部门">
                         <Row>
                             <Col span="11">
-                                <Select v-model="selectDept">
-                                    <Option v-for="(dept,index) in deptList" :value="dept.departmentCode" :disabled="user.userType===3"
-                                            :key="index">
+                                <Select v-model="selectDept" :disabled="user.userType===3">
+                                    <Option v-for="(dept,index) in deptList" :value="dept.departmentCode" :key="index">
                                         {{dept.departmentName}}
                                     </Option>
                                 </Select>
                             </Col>
                             <Col span="2" style="text-align: center">-</Col>
                             <Col span="11">
-                                <Select v-model="selectEmployee">
-                                    <Option v-for="(employee,index) in currentEmployeeList" :value="employee.userCode" v-show="employee.userType!==4"
-                                            :key="index">
+                                <Select v-model="selectEmployee" :disabled="user.userType===3">
+                                    <Option value="">不选择员工</Option>
+                                    <Option v-for="(employee,index) in currentEmployeeList" :value="employee.userCode" :key="index">
                                         {{employee.realName}}
                                     </Option>
                                 </Select>
@@ -33,7 +31,7 @@
                         </Row>
                     </FormItem>
 
-                    <FormItem label="选择部门">
+                    <FormItem label="选择时间">
                         <Row>
                             <Col span="11">
                                 <DatePicker type="datetime" name="startTime" placeholder="开始时间"
@@ -89,27 +87,51 @@
         },
         methods: {
             async submit() {
-                let user = (await this.request('/sysUser/queryOne', {
-                    id: this.selectEmployee
-                })).data;
+                if (this.selectDept === '') {
+                    this.$Message.error('请至少选择一个部门');
+                    return;
+                }
 
-                let skill = (await this.request('/skillAnalysis/query', {
-                    sysUserCode: this.selectEmployee,
-                    starDateTime: this.starDateTime,
-                    endDateTime: this.endDateTime
-                }, 'post')).data;
+                let obj = {
+                    endDateTime: this.endDateTime,
+                    starDateTime: this.starDateTime
+                };
 
-                console.log(skill);
+                /*判断是否选择员工，没有则开启部门技能分析*/
+                if (this.selectEmployee === '' || this.selectEmployee === undefined) {
+                    Reflect.set(obj, 'type', 1);
+                    Reflect.set(obj, 'departmentCode', this.selectDept);
 
+                    let dept = (await this.request('/department/queryOne', {id: this.selectDept})).data;
 
-                this.funnelMap(user.realName, skill.map(item => {
-                    return {
-                        value: item.num,
-                        name: item.lvName,
-                        message: item.lvText
-                    }
-                }))
+                    let skill = (await this.request('/skillAnalysis/query', obj, 'post')).data;
 
+                    this.funnelMap(`${dept.departmentName}(部门分析)`, skill.map(item => {
+                        return {
+                            value: item.num,
+                            name: item.lvName,
+                            message: item.lvText
+                        }
+                    }))
+
+                } else {
+                    Reflect.set(obj, 'type', 2);
+                    Reflect.set(obj, 'sysUserCode', this.selectEmployee);
+
+                    let user = (await this.request('/sysUser/queryOne', {
+                        id: this.selectEmployee
+                    })).data;
+
+                    let skill = (await this.request('/skillAnalysis/query', obj, 'post')).data;
+
+                    this.funnelMap(`${user.realName}(个人分析)`, skill.map(item => {
+                        return {
+                            value: item.num,
+                            name: item.lvName,
+                            message: item.lvText
+                        }
+                    }))
+                }
             },
             funnelMap(name, data) {
                 echarts.init(document.getElementById('main'), 'macarons').setOption({
@@ -119,7 +141,6 @@
                     tooltip: {
                         trigger: 'item',
                         formatter(name) {
-                            console.log(name);
                             return `${name.data.name}：${name.value}<br>
                                     ${name.data.message === null ? '' : name.data.message}`;
 
@@ -141,12 +162,11 @@
                             top: 60,
                             bottom: 60,
                             width: '80%',
-                            min: 0,
-                            max: 100,
                             minSize: '0%',
                             maxSize: '100%',
                             sort: 'descending',
                             gap: 2,
+                            min: 0,
                             label: {
                                 show: true,
                                 position: 'inside'
@@ -175,9 +195,26 @@
         },
         mounted() {
             /*获取部门列表*/
-            this.request('/department/query').then(data => {
-                this.deptList = data.data;
-            });
+            switch (this.user.userType) {
+                case 1:
+                    this.request('/department/query').then(data=>{
+                        this.deptList = data.data;
+                    });
+                    break;
+                case 2:
+                    this.request('/department/queryOne',{id:this.user.parentCode}).then(data=>{
+                        this.deptList.push(data.data);
+                    });
+                    break;
+                case 4:
+                    let currentDeptCode = this.user.parentCode.split(',');
+                    currentDeptCode.forEach(item=>{
+                        this.request('/department/queryOne',{id:item}).then(data=>{
+                            this.deptList.push(data.data);
+                        });
+                    });
+                    break;
+            }
         }
     }
 </script>
