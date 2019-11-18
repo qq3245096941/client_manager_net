@@ -1,19 +1,21 @@
 <template>
     <div class="content">
+        <div class="form">
+            <h1 style="text-align: center">登录</h1>
+            <Divider />
+            <Form ref="loginRules" :model="loginForm" :rules="loginRules">
+                <FormItem label="账号" prop="username">
+                    <Input v-model="loginForm.username" placeholder="手机号"></Input>
+                </FormItem>
+                <FormItem label="密码" prop="password">
+                    <Input type="password" v-model="loginForm.password" password></Input>
+                </FormItem>
+                <FormItem>
+                    <Button :loading="loading" long type="primary" @click="submit('loginRules')">登录</Button>
+                </FormItem>
+            </Form>
+        </div>
 
-        <Form ref="loginRules" :model="loginForm" :rules="loginRules" class="form">
-            <h2 style="text-align: center">登录</h2>
-            <Divider dashed/>
-            <FormItem label="手机号" prop="username">
-                <Input v-model="loginForm.username"></Input>
-            </FormItem>
-            <FormItem label="密码" prop="password">
-                <Input v-model="loginForm.password" password></Input>
-            </FormItem>
-            <FormItem>
-                <Button :loading="loading" long type="primary" @click="submit('loginRules')">登录</Button>
-            </FormItem>
-        </Form>
     </div>
 </template>
 
@@ -24,8 +26,8 @@
             return {
                 loading: false,
                 loginForm: {
-                    username: 'admin123',
-                    password: 'admin123',
+                    username: '',
+                    password: '',
                 },
                 loginRules: {
                     username: [
@@ -50,9 +52,9 @@
                     if (valid) {
                         this.request('/login/login', this.loginForm, 'post').then(data => {
                             /*提交user到仓库*/
-                            this.$store.commit('setUser',data.data);
+                            this.$store.commit('setUser', data.data);
                             this.loading = false;
-                            this.$router.push({path:'/AllClient'});
+                            this.$router.push({path: '/AllClient'});
                             window.location.reload();
 
                         })
@@ -73,13 +75,16 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
+        background: url("../assets/back.png");
+        background-size: 100%;
     }
 
     .form {
-        border-radius: 5px;
-        margin: 100px auto;
+        border-radius: 20px;
+        margin: 150px auto;
         padding: 20px;
-        background: #fff;
-        width: 350px;
+        background: rgba(255, 255, 255, 0.39);
+        width: 360px;
+        box-shadow: 1px 2px 10px #6b3d3b;
     }
 </style>

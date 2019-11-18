@@ -1,0 +1,1 @@
+const rootUrl = 'http://www.51tmeng/wxClient';

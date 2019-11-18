@@ -100,7 +100,10 @@
             }
         },
         mounted() {
-            this.request('/department/query', {type: 1}).then(data => {
+            this.request('/department/query',{
+                type: 1,
+                sysUserCode:this.user.userCode
+            }).then(data => {
                 this.currentDeptCode = data.data[0].departmentCode;
                 this.clickTab(this.currentDeptCode);
                 this.deptList = data.data;

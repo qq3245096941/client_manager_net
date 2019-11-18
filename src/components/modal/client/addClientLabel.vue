@@ -70,6 +70,7 @@
                     intentionOfIndicatorsCode: this.clickList.join(',')
                 }).then(data => {
                     this.$Message.success('添加成功');
+                    window.location.reload();
                     this.content.isOpen = false;
                 })
             }
