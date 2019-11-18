@@ -128,6 +128,13 @@
 <script>
     export default {
         name: "clientSearch",
+        props: {
+            /*分页+排序*/
+            page: {
+                type: Object,
+                required: true
+            }
+        },
         data() {
             return {
                 searchFrom: {
@@ -156,11 +163,13 @@
         methods: {
             search() {
                 this.isLoading = true;
-                Reflect.set(this.searchFrom,'page',1);
-                Reflect.set(this.searchFrom,'limit',1000000);
+
+                Reflect.set(this.searchFrom, 'page', this.page.page);
+                Reflect.set(this.searchFrom, 'limit', this.page.limit);
+                Reflect.set(this.searchFrom, 'showType', this.page.sort);
+
                 this.request('/client/query', this.searchFrom).then(data => {
                     this.isLoading = false;
-                    this.$Message.success(`搜索完成，总共搜索到${data.data.length}条数据`);
                     this.$emit('search', data);
                 });
             }

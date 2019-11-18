@@ -17,17 +17,22 @@
                 本周任务：<br>
                 <template v-for="(task,index) in currentGroupTask">
                     {{task.deptName}}目标微信量：
-                    <Tag checkable color="error">{{task.rwWXNum}}</Tag>， 已完成微信量
+                    <Tag checkable color="error">{{task.rwWXNum}}</Tag>
+                    ， 已完成微信量
                     <Tag checkable color="success">{{task.WXNum}}</Tag>
                     <br>
                 </template>
             </Alert>
             <Alert type="error" v-show="currentGroupTask.length===0&&user.userType!==1">本周暂未分配任务</Alert>
 
-            <clientSearch ref="clientSearch" @search="searchClient"></clientSearch>
+            <clientSearch ref="clientSearch" @search="searchClient" :page.sync="clientPage"></clientSearch>
 
-            <Table :row-class-name="rowClassName" :loading="tableLoading" :columns="clientTable" height="520"
+            <Table @on-sort-change="clientSort" size="large" :row-class-name="rowClassName" :loading="tableLoading"
+                   :columns="clientTable" height="680"
                    :data="clientList"></Table>
+
+            <Page :total="clientPage.total" @on-change="changePage" @on-page-size-change="pageSizeChange"
+                  :current.sync="clientPage.page" show-sizer/>
         </Card>
     </div>
 </template>
@@ -85,7 +90,7 @@
                     {
                         title: '意向度',
                         key: 'schedule',
-                        sortable: true,
+                        sortable: 'custom',
                         width: 200,
                         render: (h, params) => {
                             return h('div', {}, [
@@ -120,7 +125,7 @@
                         title: '添加时间',
                         key: 'createTime',
                         sortable: true,
-                        width: 150
+                        width: 170
                     },
                     {
                         title: '最后跟进时间',
@@ -242,7 +247,17 @@
                 /*表格是否加载中*/
                 tableLoading: false,
                 /*组任务情况，如果是经理，则有多个组*/
-                currentGroupTask: []
+                currentGroupTask: [],
+                /*分页*/
+                clientPage: {
+                    total: 0,
+                    page: 1,
+                    limit: 10,
+                    /*1：时间升序，2：时间降序，3：进度升序，4：进度降序*/
+                    sort: ''
+                },
+                /*是否是搜索得到的数据*/
+                isSearchClient: false
             }
         },
         watch: {
@@ -255,6 +270,35 @@
                 }
         },
         methods: {
+            /*客户排序*/
+            clientSort(data) {
+                switch (data.key) {
+                    case 'createTime':
+                        if (data.order === 'desc') {
+                            Reflect.set(this.clientPage, 'sort', 2);
+                        } else {
+                            Reflect.set(this.clientPage, 'sort', 1);
+                        }
+                        break;
+                    case 'schedule':
+                        if (data.order === 'desc') {
+                            Reflect.set(this.clientPage, 'sort', 4);
+                        } else {
+                            Reflect.set(this.clientPage, 'sort', 3);
+                        }
+                        break;
+                }
+                this.getClientList();
+            },
+            /*监听页码变化*/
+            changePage(page) {
+                Reflect.set(this.clientPage, 'page', page);
+                this.getClientList();
+            },
+            pageSizeChange(pageSize) {
+                Reflect.set(this.clientPage, 'limit', pageSize);
+                this.getClientList();
+            },
             /*通过开发状态，给表格每行设置颜色*/
             rowClassName(row, index) {
                 if (row.cooperationStatus === '开发中') {
@@ -277,6 +321,10 @@
             },
             /*搜索后返回的数据*/
             searchClient(data) {
+                /*将表格数据标记为搜索得到的数据，方便后续分页和排序做铺垫*/
+                this.isSearchClient = true;
+
+                Reflect.set(this.clientPage, 'total', data.total);
                 this.clientList = data.data.map(item => {
                     return this.$store.getters.tidyClient(item);
                 });
@@ -285,9 +333,17 @@
             getClientList() {
                 this.tableLoading = true;
 
+                /*判断是否是搜索得到的数据，如果是则直接调用搜索组件的确定搜索方法，抛弃下面常规方式*/
+                if (this.isSearchClient) {
+                    this.tableLoading = false;
+                    this.$refs.clientSearch.search();
+                    return;
+                }
+
                 let obj = {
-                    page: 1,
-                    limit: 10000000,
+                    page: this.clientPage.page,
+                    limit: this.clientPage.limit,
+                    showType: this.clientPage.sort
                 };
 
                 switch (this.user.userType) {
@@ -304,6 +360,7 @@
                 }
 
                 this.request('/client/query', obj).then(data => {
+                    Reflect.set(this.clientPage, 'total', data.total); //总条数
                     this.tableLoading = false;
                     this.clientList = data.data.map(item => {
                         return this.$store.getters.tidyClient(item);

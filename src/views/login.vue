@@ -52,11 +52,15 @@
                     if (valid) {
                         this.request('/login/login', this.loginForm, 'post').then(data => {
                             /*提交user到仓库*/
-                            this.$store.commit('setUser', data.data);
-                            this.loading = false;
-                            this.$router.push({path: '/AllClient'});
-                            window.location.reload();
-
+                            if(data.succeed===1){
+                                this.$store.commit('setUser', data.data);
+                                this.loading = false;
+                                this.$router.push({path: '/AllClient'});
+                                window.location.reload();
+                            }else{
+                                this.$Message.error(data.message);
+                                this.loading = false;
+                            }
                         })
                     } else {
                         this.$Message.error('登录失败');

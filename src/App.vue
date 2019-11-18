@@ -61,6 +61,8 @@
                 this.currentPath = to.path;
             },
             currentPath(path) {
+                if (this.menuList === undefined) return;
+
                 this.menuList.forEach((parent, parentIndex) => {
                     parent.sonList.forEach((children, childrenIndex) => {
                         if (children.redirectUrl === path) {
