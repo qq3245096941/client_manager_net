@@ -157,13 +157,14 @@
                 /*选择部门时，所在的员工*/
                 employeeList: [],
                 /*所有等级*/
-                classList: []
+                classList: [],
+                /*是否是第一次按搜索*/
+                isFirstSearch: true
             }
         },
         methods: {
             search() {
                 this.isLoading = true;
-
                 Reflect.set(this.searchFrom, 'page', this.page.page);
                 Reflect.set(this.searchFrom, 'limit', this.page.limit);
                 Reflect.set(this.searchFrom, 'showType', this.page.sort);

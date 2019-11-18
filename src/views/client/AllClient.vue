@@ -337,6 +337,7 @@
                 if (this.isSearchClient) {
                     this.tableLoading = false;
                     this.$refs.clientSearch.search();
+                    this.clientPage.page = 1;
                     return;
                 }
 

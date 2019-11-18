@@ -64,7 +64,7 @@
                 } else {
                     Reflect.set(this.taskForm, 'missionType', 2);
                     Reflect.set(this.taskForm, 'relevanceCode', dept.departmentCode);
-                    await this.request('/mission/insert', this.taskCode);
+                    await this.request('/mission/insert', this.taskForm);
                     this.$Message.success('分配成功');
                 }
 
