@@ -6,20 +6,7 @@
                 <BreadcrumbItem>所有标签</BreadcrumbItem>
             </Breadcrumb>
         </p>
-        <Row :gutter="8">
-            <Col v-for="(label,index) in labelList" style="margin-bottom: 5px" span="3" :key="index" >
-                <Card class="card" :style="{background:label.intentionOfIndicatorsType===1?'#19be6b':'#ed4014'}">
-                    <h1>{{label.intentionOfIndicatorsNum}}分</h1>
-                    <p>{{label.intentionOfIndicatorsName}}</p>
-                    <ButtonGroup size="small" v-show="user.userType!==3">
-                        <Button shape="circle" icon="ios-brush"
-                                @click="editLabel(label.intentionOfIndicatorsCode)"></Button>
-                        <Button shape="circle" icon="md-trash"
-                                @click="deleteLabel(label.intentionOfIndicatorsCode,index)"></Button>
-                    </ButtonGroup>
-                </Card>
-            </Col>
-        </Row>
+        <Table disabled-hover :row-class-name="setTableStyle" :columns="labelTable" :data="labelList"></Table>
     </Card>
 </template>
 
@@ -28,7 +15,61 @@
         name: "AllLabel",
         data() {
             return {
-                labelList: []
+                labelList: [],
+                labelTable: [
+                    {
+                        title: '标签值',
+                        key: 'intentionOfIndicatorsNum',
+                        width: 100
+                    },
+                    {
+                        title: '标签描述',
+                        key: 'intentionOfIndicatorsName'
+                    },
+                    {
+                        title: '操作',
+                        width: 300,
+                        render: (h, param) => {
+                            return h('ButtonGroup', {},
+                                [
+                                    h('Button', {
+                                        props: {
+                                            type: 'success',
+                                        },
+                                        on: {
+                                            click: () => {
+                                                this.$router.push({
+                                                    path: '/AddLabel',
+                                                    query: {code: param.row.intentionOfIndicatorsCode}
+                                                })
+                                            }
+                                        }
+                                    }, '修改'),
+                                    h('Button', {
+                                        props: {
+                                            type: 'error'
+                                        },
+                                        on: {
+                                            click: () => {
+                                                if (!confirm('确定删除吗?')) return;
+                                                this.request('/intentionOfIndicators/delete', {
+                                                    ids: param.row.intentionOfIndicatorsCode
+                                                }).then(data => {
+                                                    if (data.succeed === 1) {
+                                                        this.$Message.success('删除成功');
+                                                        this.labelList.splice(param.index, 1);
+                                                    } else {
+                                                        this.$Message.error(data.message);
+                                                    }
+                                                })
+                                            }
+                                        }
+                                    }, '删除'),
+                                ]
+                            )
+                        }
+                    }
+                ]
             }
         },
         mounted() {
@@ -37,30 +78,16 @@
             })
         },
         methods: {
-            deleteLabel(code, index) {
-                if (!confirm('确定删除吗?')) return;
-
-                this.request('/intentionOfIndicators/delete', {
-                    ids: code
-                }).then(data => {
-                    if (data.succeed === 1) {
-                        this.$Message.success('删除成功');
-                        this.labelList.splice(index, 1);
-                    } else {
-                        this.$Message.error(data.message);
-                    }
-                })
-            },
-            /*编辑标签*/
-            editLabel(code) {
-                this.$router.push({path: '/AddLabel', query: {code}})
+            setTableStyle(row, index) {
+                return row.intentionOfIndicatorsType === 1 ? '' : 'demo-table-error-row'
             }
         }
     }
 </script>
 
-<style scoped>
-    .card {
-        color: #fff
+<style>
+    .ivu-table .demo-table-error-row td {
+        background-color: #ff6600;
+        color: #fff;
     }
 </style>

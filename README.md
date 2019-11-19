@@ -30,14 +30,11 @@ this.request('/client/update', {
 
 ### 监听v-for渲染完成
 ```
-watch:{
-    employeeList() {
-        this.$nextTick(()=>{
-            //执行操作
-        })
-    }
-}
+this.$nextTick(()=>{
+    //执行操作
+})
 ```
+在任意地方调用即可，``this.$nextTick``返回``Promise``对象。可以使用``async await``
 
 ### 监听路由变化
 ```
@@ -47,3 +44,4 @@ watch:{
   }
 },
 ```
+### iview表格自定义行样式时，需要去掉``style``标签上的``scoped``

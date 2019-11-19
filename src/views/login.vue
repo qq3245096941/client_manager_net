@@ -80,7 +80,7 @@
         height: 100%;
         overflow: hidden;
         background: url("../assets/back.png");
-        background-size: 100%;
+        background-size: 100% 100%;
     }
 
     .form {

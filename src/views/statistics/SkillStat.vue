@@ -23,7 +23,9 @@
                             <Col span="11">
                                 <Select v-model="selectEmployee" :disabled="user.userType===3">
                                     <Option value="">不选择员工</Option>
-                                    <Option v-for="(employee,index) in currentEmployeeList" :value="employee.userCode" :key="index">
+                                    <Option v-show="employee.userType===3"
+                                            v-for="(employee,index) in currentEmployeeList" :value="employee.userCode"
+                                            :key="index">
                                         {{employee.realName}}
                                     </Option>
                                 </Select>
@@ -197,19 +199,19 @@
             /*获取部门列表*/
             switch (this.user.userType) {
                 case 1:
-                    this.request('/department/query').then(data=>{
+                    this.request('/department/query').then(data => {
                         this.deptList = data.data;
                     });
                     break;
                 case 2:
-                    this.request('/department/queryOne',{id:this.user.parentCode}).then(data=>{
+                    this.request('/department/queryOne', {id: this.user.parentCode}).then(data => {
                         this.deptList.push(data.data);
                     });
                     break;
                 case 4:
                     let currentDeptCode = this.user.parentCode.split(',');
-                    currentDeptCode.forEach(item=>{
-                        this.request('/department/queryOne',{id:item}).then(data=>{
+                    currentDeptCode.forEach(item => {
+                        this.request('/department/queryOne', {id: item}).then(data => {
                             this.deptList.push(data.data);
                         });
                     });

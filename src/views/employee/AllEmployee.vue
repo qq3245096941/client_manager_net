@@ -116,7 +116,8 @@
                             },
                             /*默认展开的层数*/
                             initialTreeDepth: 4,
-                            animationDurationUpdate: 500
+                            animationDurationUpdate: 500,
+                            roam:'move'
                         }
                     ]
                 });

@@ -154,7 +154,7 @@
                                     h('Button',
                                         {
                                             props: {
-                                                type: 'success'
+                                                type: 'warning'
                                             },
                                             on: {
                                                 click: () => {
@@ -384,7 +384,6 @@
                         Reflect.set(obj, 'rwWXNum', task.rwWXNum);
                         Reflect.set(obj, 'WXNum', task.WXNum);
                         this.currentGroupTask.push(obj);
-                        console.log(this.currentGroupTask);
                         break;
                     case 4:
                         let deptList = this.user.parentCode.split(',');
@@ -415,15 +414,14 @@
     }
 </script>
 
-<style scoped>
+<style>
     .ivu-table .table-success-row td {
         background-color: #19be6b;
         color: #fff;
     }
 
     .ivu-table .table-info-row td {
-        background-color: #ff9900;
-        color: #fff;
+        background-color: #fff;
     }
 
     .ivu-table .table-error-row td {
