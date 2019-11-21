@@ -67,7 +67,7 @@
                         <Row>
                             <Col span="12">
                                 <Select v-model="clientForm.sysUserCode">
-                                    <Option v-show="employee.userType!==1" v-for="(employee,index) in employeeList"
+                                    <Option v-show="employee.userType!==4" v-for="(employee,index) in employeeList"
                                             :key="index"
                                             :value="employee.userCode">
                                         {{employee.realName}}
@@ -232,7 +232,6 @@
             /*当前部门的员工*/
             this.request('/sysUser/query', {
                 parentCode: this.user.parentCode,
-                userType: 3
             }).then(data => {
                 this.employeeList = data.data;
             })
