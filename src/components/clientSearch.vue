@@ -112,12 +112,13 @@
                                     </Select>
                                 </Col>
                             </FormItem>
+                            <FormItem>
+                                <ButtonGroup>
+                                    <Button type="success" @click="search" :loading="isLoading">搜索</Button>
+                                    <Button type="primary" @click="exportExcel">导出到excel</Button>
+                                </ButtonGroup>
+                            </FormItem>
                         </Form>
-
-                        <div style="text-align: center">
-                            <Button style="display: inline" type="success" @click="search" :loading="isLoading">搜索
-                            </Button>
-                        </div>
                     </Col>
                 </Row>
             </p>
@@ -173,6 +174,12 @@
                     this.isLoading = false;
                     this.$emit('search', data);
                 });
+            },
+            /*导出到excel*/
+            exportExcel() {
+                Reflect.set(this.searchFrom, 'page', 1);
+                Reflect.set(this.searchFrom, 'limit', 100000);
+                window.location.href = this.$store.getters.createURL(this.searchFrom);
             }
         },
         watch: {

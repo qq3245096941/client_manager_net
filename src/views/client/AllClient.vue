@@ -27,8 +27,13 @@
 
             <clientSearch ref="clientSearch" @search="searchClient" :page.sync="clientPage"></clientSearch>
 
-            <Table @on-sort-change="clientSort" size="large" :row-class-name="rowClassName" :loading="tableLoading"
-                   :columns="clientTable" height="680"
+            <Table row-key
+                   @on-sort-change="clientSort"
+                   size="large"
+                   :row-class-name="rowClassName"
+                   :loading="tableLoading"
+                   :columns="clientTable"
+                   height="680"
                    :data="clientList"></Table>
 
             <Page :total="clientPage.total" @on-change="changePage" @on-page-size-change="pageSizeChange"

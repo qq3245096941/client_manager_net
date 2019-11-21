@@ -101,6 +101,7 @@
         },
         mounted() {
             this.request('/department/query',{
+                /*这里表示返回的数据中会出现一个status，表示本周是否有给本部门分配任务*/
                 type: 1,
                 sysUserCode:this.user.userCode
             }).then(data => {

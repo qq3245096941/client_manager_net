@@ -45,3 +45,16 @@ watch:{
 },
 ```
 ### iview表格自定义行样式时，需要去掉``style``标签上的``scoped``
+***
+### 拼接对象为路径
+```
+createURL(url, param) {
+    let urlLink = '';
+    $.each(param, (item, key) => {
+        let link = '&' + item + "=" + key;
+        urlLink += link;
+    });
+    urlLink = url + "?" + urlLink.substr(1);
+    return urlLink.replace(' ', '');
+},
+```
