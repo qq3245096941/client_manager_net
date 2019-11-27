@@ -1,1 +1,1 @@
-const rootUrl = 'http://www.51tmeng.com/wxClient';
+const rootUrl = 'http://192.168.0.139:8081';

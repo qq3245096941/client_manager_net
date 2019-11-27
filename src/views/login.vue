@@ -2,7 +2,7 @@
     <div class="content">
         <div class="form">
             <h1 style="text-align: center">登录</h1>
-            <Divider />
+            <Divider/>
             <Form ref="loginRules" :model="loginForm" :rules="loginRules">
                 <FormItem label="账号" prop="username">
                     <Input v-model="loginForm.username" placeholder="手机号"></Input>
@@ -52,13 +52,27 @@
                     if (valid) {
                         this.request('/login/login', this.loginForm, 'post').then(data => {
                             /*提交user到仓库*/
-                            if(data.succeed===1){
+                            if (data.succeed === 1) {
                                 this.$store.commit('setUser', data.data);
                                 this.loading = false;
                                 this.$router.push({path: '/AllClient'});
-                                window.location.reload();
-                            }else{
-                                this.$Message.error(data.message);
+
+                                if(data.message==='登录成功'){
+                                    this.$Notice.warning({
+                                        title: data.message,
+                                        duration:3000
+                                    });
+                                }else{
+                                    this.$Notice.warning({
+                                        title: data.message,
+                                        duration:0
+                                    });
+                                }
+
+                            } else {
+                                this.$Message.error({
+                                    content: data.message
+                                });
                                 this.loading = false;
                             }
                         })

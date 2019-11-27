@@ -50,10 +50,15 @@
         },
         data() {
             return {
-                menuList: [],
                 currentPath: '',
                 active: '', //选中的子菜单
                 open: []  //展开的菜单，必须是数组
+            }
+        },
+        computed:{
+            /*获取菜单*/
+            menuList(){
+                return this.user.menuList;
             }
         },
         watch: {
@@ -83,7 +88,6 @@
             }
         },
         mounted() {
-            this.menuList = this.user.menuList;
             this.currentPath = this.$route.path;
         }
     }
