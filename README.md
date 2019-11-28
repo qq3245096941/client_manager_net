@@ -1,3 +1,7 @@
+### 演示
+[客户管理系统网销版](http://www.51tmeng.com/wxClient/#/)
+* 账号：admin123
+* 密码：admin123
 ### 监听data里面对象的属性变化
 ```
  watch: {
